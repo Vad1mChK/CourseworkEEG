@@ -1,3 +1,4 @@
+# === NODE.JS ===
 # Logs
 logs
 *.log
@@ -137,3 +138,9 @@ dist
 # Vite logs files
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
+
+# === GENERAL ===
+# idea
+.idea/
+eeg-frontend/.idea/
+eeg-backend/.idea/
