@@ -36,7 +36,7 @@ const ConfigurationPage = () => {
             rawFile: f,
             serverId: null,
         }));
-        if (mode === AnalysisMode.SINGLE && newFiles.length > 0) {
+        if (mode === 'SINGLE' && newFiles.length > 0) {
             // SINGLE mode: Replace all files with the first new one
             setFiles([newFiles[0]]);
         } else {
