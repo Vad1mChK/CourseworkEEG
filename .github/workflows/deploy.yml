@@ -1,22 +1,24 @@
-name: Deploy to GitHub Pages
+name: Deploy EEG Frontend to GitHub Pages
 
-# 1. Trigger the workflow
 on:
   push:
     branches:
-      - main
+      - main # Trigger on pushes to the main branch
   workflow_dispatch:
 
-# 2. Define permissions required for deployment
 permissions:
   contents: write
   pages: write
   id-token: write
 
-# 3. Define the Environment (The incorrect block is removed!)
-# environment:  <-- REMOVE THIS BLOCK
-#   name: github-pages
-#   url: ${{ steps.deployment.outputs.page_url }}
+# Define the environment globally for the deploy job to link to
+environment:
+  name: github-pages
+  url: ${{ steps.deployment.outputs.page_url }}
+
+# 💡 Define the subdirectory where the frontend files are located
+env:
+  WORKING_DIRECTORY: eeg_frontend
 
 jobs:
   # Job 1: Build the application assets
@@ -29,22 +31,27 @@ jobs:
       - name: 🔧 Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '24'
+          node-version: '20'
 
+      # 📦 Install dependencies inside the subdirectory
       - name: 📦 Install Dependencies
         run: npm install
+        working-directory: ${{ env.WORKING_DIRECTORY }} # 👈 CRITICAL FIX: Run command in the correct folder
 
+      # 🏗️ Build Application inside the subdirectory
       - name: 🏗️ Build Application
-        run: npm run build 
+        run: npm run build
+        working-directory: ${{ env.WORKING_DIRECTORY }} # 👈 CRITICAL FIX: Run command in the correct folder
 
+      # ➡️ Upload the build artifact
+      # The build output is now at ./eeg_frontend/dist (relative to the repo root)
       - name: ⬆️ Upload Build Artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: ./dist 
+          path: ${{ env.WORKING_DIRECTORY }}/dist # 👈 CRITICAL FIX: Specify the path relative to the root
 
   # Job 2: Deploy the uploaded artifact to GitHub Pages
   deploy:
-    # 💡 The environment is correctly defined here, at the job level.
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
