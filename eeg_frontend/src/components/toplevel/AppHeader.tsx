@@ -10,7 +10,7 @@ interface AppHeaderProps {
 
 const AppHeader = ({ headerText, resetText }: AppHeaderProps) => {
     const { i18n } = useTranslation();
-    const currentLanguage = i18n.language;
+    const currentLanguage = i18n.language || "ru";
     const handleLanguageChange = (event: SelectChangeEvent<string>) => {
         const newLanguage = event.target.value;
         // i18n.changeLanguage is the i18next function to switch locales
