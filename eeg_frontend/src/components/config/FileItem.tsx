@@ -11,7 +11,7 @@ const FileItem = ({
                       onRemove
                   }: {
     file: EEGFileConfig,
-    onUpdate: (id: string, field: string, val: any) => void,
+    onUpdate: (id: string, field: keyof EEGFileConfig, val: any) => void,
     onRemove: (id: string) => void
 }) => {
     const { t } = useTranslation();
