@@ -1,0 +1,9 @@
+{
+  "header_appName": "NeuroAnalyzr",
+  "header_resetBtn": "Сброс",
+  "mode_label_group": "Группа",
+  "mode_label_single": "Один файл",
+  "mode_description_group": "Анализ группы файлов (одинаковый ритм)",
+  "mode_description_single": "Анализ одного файла (много ритмов)",
+  "footer_copyrightText": "\u00a9 2025 NeuroAnalyzr. Все права защищены."
+}

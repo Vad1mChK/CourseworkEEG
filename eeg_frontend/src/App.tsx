@@ -1,35 +1,26 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import React from "react";
+import {darkTheme} from "./theme/theme.ts";
+import {ThemeProvider, CssBaseline} from "@mui/material";
+import RootContainer from "./components/toplevel/RootContainer.tsx";
+import AppHeader from "./components/toplevel/AppHeader.tsx";
+import AppFooter from "./components/toplevel/AppFooter.tsx";
+import AppMainContainer from "./components/toplevel/AppMainContainer.tsx";
+import {useTranslation} from "react-i18next";
+import ModeConfiguration from "./components/config/ModeConfiguration.tsx";
 
-function App() {
-  const [count, setCount] = useState(0)
+export default function App(){
+    const { t, i18n } = useTranslation();
 
-  return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    return (
+        <ThemeProvider theme={darkTheme}>
+            <CssBaseline/>
+            <RootContainer>
+                <AppHeader headerText={t('header_appName')} resetText={t('header_resetBtn')}/>
+                <AppMainContainer>
+                    <ModeConfiguration onModeChange={() => {}}/>
+                </AppMainContainer>
+                <AppFooter footerText={t('footer_copyrightText')} />
+            </RootContainer>
+        </ThemeProvider>
+    );
 }
-
-export default App

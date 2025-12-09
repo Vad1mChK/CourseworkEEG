@@ -1,0 +1,9 @@
+{
+  "header_appName": "NeuroAnalyzr",
+  "header_resetBtn": "Reset",
+  "mode_label_group": "Group",
+  "mode_label_single": "Single File",
+  "mode_description_group": "Group analysis (same rhythm)",
+  "mode_description_single": "Single file analysis (multiple rhythms)",
+  "footer_copyrightText": "\u00a9 2025 NeuroAnalyzr. All rights reserved."
+}

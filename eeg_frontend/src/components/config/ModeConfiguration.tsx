@@ -1,0 +1,55 @@
+// src/components/ModeConfiguration.tsx
+
+import * as React from 'react';
+import { Paper, Tabs, Tab, Box, Typography } from "@mui/material";
+import { useTranslation } from 'react-i18next';
+import { AnalysisMode } from '../../types/configTypes'; // 👈 Import the constant and type
+
+// Define the component props
+interface ModeConfigurationProps {
+    // Callback function to send the new mode (GROUP or SINGLE) back to the parent
+    onModeChange: (mode: AnalysisMode) => void;
+}
+
+const ModeConfiguration: React.FC<ModeConfigurationProps> = ({ onModeChange }) => {
+    const { t } = useTranslation();
+
+    // Local state for the selected tab index (0 for Group, 1 for Single File)
+    const [tabValue, setTabValue] = React.useState(0);
+
+    const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
+        setTabValue(newValue);
+
+        // Map the tab index to the AnalysisMode constant and call the parent callback
+        const newMode: AnalysisMode = newValue === 0 ? AnalysisMode.GROUP : AnalysisMode.SINGLE;
+        onModeChange(newMode);
+    };
+
+    // Determine the descriptive text based on the current tab value
+    // We use dynamic translation keys here: 'mode.group' or 'mode.single'
+    const descriptionKey = tabValue === 0 ? 'mode_description_group' : 'mode_description_single';
+
+    return (
+        <Paper sx={{ overflow: 'hidden' }}>
+            <Tabs
+                value={tabValue}
+                onChange={handleTabChange}
+                variant="fullWidth"
+                indicatorColor="primary"
+                textColor="primary"
+            >
+                {/* 1. Use translation for the Tab labels */}
+                <Tab label={t('mode_label_group')} />
+                <Tab label={t('mode_label_single')} />
+            </Tabs>
+            <Box sx={{ p: 2 }}>
+                <Typography variant="caption" color="text.secondary">
+                    {/* 2. Use translation for the description */}
+                    {t(descriptionKey)}
+                </Typography>
+            </Box>
+        </Paper>
+    );
+};
+
+export default ModeConfiguration;
