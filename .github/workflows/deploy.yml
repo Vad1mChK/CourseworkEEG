@@ -1,4 +1,4 @@
-name: Deploy EEG Frontend to GitHub Pages
+name: Deploy to GitHub Pages
 
 on:
   push:
@@ -11,19 +11,16 @@ permissions:
   pages: write
   id-token: write
 
-# Define the environment globally for the deploy job to link to
-environment:
-  name: github-pages
-  url: ${{ steps.deployment.outputs.page_url }}
-
-# 💡 Define the subdirectory where the frontend files are located
-env:
-  WORKING_DIRECTORY: eeg_frontend
-
 jobs:
-  # Job 1: Build the application assets
+  # Job 1: Build the application assets (located in eeg_frontend)
   build:
     runs-on: ubuntu-latest
+    
+    # 🚨 CRITICAL FIX: Set the working directory for all steps in this job
+    defaults:
+      run:
+        working-directory: ./eeg_frontend 
+        
     steps:
       - name: ⬇️ Checkout Repository
         uses: actions/checkout@v4
@@ -31,24 +28,21 @@ jobs:
       - name: 🔧 Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '20' 
 
-      # 📦 Install dependencies inside the subdirectory
+      # These commands will now run inside ./eeg_frontend
       - name: 📦 Install Dependencies
         run: npm install
-        working-directory: ${{ env.WORKING_DIRECTORY }} # 👈 CRITICAL FIX: Run command in the correct folder
 
-      # 🏗️ Build Application inside the subdirectory
       - name: 🏗️ Build Application
-        run: npm run build
-        working-directory: ${{ env.WORKING_DIRECTORY }} # 👈 CRITICAL FIX: Run command in the correct folder
+        run: npm run build 
 
-      # ➡️ Upload the build artifact
-      # The build output is now at ./eeg_frontend/dist (relative to the repo root)
       - name: ⬆️ Upload Build Artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: ${{ env.WORKING_DIRECTORY }}/dist # 👈 CRITICAL FIX: Specify the path relative to the root
+          # 🚨 CRITICAL FIX: The path is now RELATIVE to the working directory 
+          # which should be the folder containing the build output (e.g., ./eeg_frontend/dist)
+          path: ./eeg_frontend/dist 
 
   # Job 2: Deploy the uploaded artifact to GitHub Pages
   deploy:
