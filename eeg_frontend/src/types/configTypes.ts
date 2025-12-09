@@ -1,3 +1,5 @@
+import type {BrainZone, RhythmType} from "./eegTypes.ts";
+
 const AnalysisMode = {
     GROUP: 'GROUP',
     SINGLE: 'SINGLE'
@@ -14,5 +16,18 @@ interface EEGFileConfig {
     serverId: string | null;
 }
 
-export type { EEGFileConfig };
-export { AnalysisMode };
+interface EEGSingleAnalysisFormData {
+    analysisMode: typeof AnalysisMode.SINGLE;
+    file: EEGFileConfig;
+    brainZone: BrainZone;
+    rhythms: RhythmType[];
+}
+interface EEGGroupAnalysisFormData {
+    analysisMode: typeof AnalysisMode.GROUP;
+    files: EEGFileConfig[];
+    brainZone: BrainZone;
+    rhythm: RhythmType;
+}
+type EEGAnalysisFormData = EEGSingleAnalysisFormData | EEGGroupAnalysisFormData;
+
+export type { EEGFileConfig, EEGAnalysisFormData, AnalysisMode };

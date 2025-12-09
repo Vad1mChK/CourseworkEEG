@@ -1,6 +1,7 @@
 {
   "header_appName": "NeuroAnalyzr",
   "header_resetBtn": "Reset",
+
   "config_mode_label_group": "Group",
   "config_mode_label_single": "Single File",
   "config_mode_description_group": "Group analysis (same rhythm)",
@@ -13,13 +14,23 @@
   "config_file_itemAmplitudeCol": "Amplitude Col",
   "config_rhythm": "Rhythm Configuration",
   "config_rhythm_brainZone": "Brain Zone",
-  "config_rhythm_brainZone_FRONTAL": "Frontal",
-  "config_rhythm_brainZone_PARIETAL": "Parietal",
-  "config_rhythm_brainZone_CENTRAL": "Central",
-  "config_rhythm_brainZone_TEMPORAL": "Temporal",
-  "config_rhythm_brainZone_OCCIPITAL": "Occipital",
   "config_rhythm_targetRhythm": "Target Rhythm",
   "config_rhythm_targetRhythms": "Target Rhythms",
   "config_submit": "Analyze",
-  "footer_copyrightText": "\u00a9 2025 NeuroAnalyzr. All rights reserved."
+
+  "footer_copyrightText": "\u00a9 2025 NeuroAnalyzr. All rights reserved.",
+
+  "misc_brainZone_FRONTAL": "Frontal",
+  "misc_brainZone_PARIETAL": "Parietal",
+  "misc_brainZone_CENTRAL": "Central",
+  "misc_brainZone_TEMPORAL": "Temporal",
+  "misc_brainZone_OCCIPITAL": "Occipital",
+  "misc_rhythm_ALPHA": "Alpha (α)",
+  "misc_rhythm_BETA": "Beta (β)",
+  "misc_rhythm_GAMMA": "Gamma (γ)",
+  "misc_rhythm_DELTA": "Delta (δ)",
+  "misc_rhythm_THETA": "Theta (θ)",
+  "misc_rhythm_KAPPA": "Kappa (κ)",
+  "misc_rhythm_LAMBDA": "Lambda (λ)",
+  "misc_rhythm_MU": "Mu (μ)"
 }

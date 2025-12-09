@@ -3,7 +3,7 @@
 import * as React from 'react';
 import { Paper, Tabs, Tab, Box, Typography } from "@mui/material";
 import { useTranslation } from 'react-i18next';
-import { AnalysisMode } from '../../types/configTypes'; // 👈 Import the constant and type
+import type { AnalysisMode } from '../../types/configTypes'; // 👈 Import the constant and type
 
 // Define the component props
 interface ModeConfigurationProps {
@@ -13,7 +13,7 @@ interface ModeConfigurationProps {
 }
 
 const ModeConfigurationBlock: React.FC<ModeConfigurationProps> = (
-    { mode = AnalysisMode.GROUP, onModeChange }
+    { mode = 'GROUP', onModeChange }
 ) => {
     const { t } = useTranslation();
 
@@ -24,7 +24,7 @@ const ModeConfigurationBlock: React.FC<ModeConfigurationProps> = (
         setTabValue(newValue);
 
         // Map the tab index to the AnalysisMode constant and call the parent callback
-        const newMode: AnalysisMode = newValue === 0 ? AnalysisMode.GROUP : AnalysisMode.SINGLE;
+        const newMode: AnalysisMode = newValue === 0 ? 'GROUP' : 'SINGLE';
         onModeChange(newMode);
     };
 

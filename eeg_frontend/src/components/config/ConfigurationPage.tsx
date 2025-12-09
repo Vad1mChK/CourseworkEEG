@@ -1,19 +1,29 @@
 import React, { useState } from "react";
-import type { AnalysisMode } from "../../types/configTypes.ts";
-import type { EEGFileConfig } from "../../types/configTypes.ts";
+import type { AnalysisMode, EEGFileConfig, EEGAnalysisFormData } from "../../types/configTypes.ts";
 import { useTranslation } from "react-i18next";
-import {Box, Chip, FormControl, InputLabel, MenuItem, Select, Stack} from "@mui/material";
+import {Box, Button, Chip, FormControl, InputLabel, MenuItem, Select, Stack} from "@mui/material";
 
 import ModeConfigurationBlock from "./ModeConfigurationBlock.tsx";
 import ConfigurationBlock from "./ConfigurationBlock.tsx";
-import {Activity, Upload} from "lucide-react";
+import {Activity, Play, Upload} from "lucide-react";
 import FileDropzone from "./FileDropzone.tsx";
 import FileItem from "./FileItem.tsx";
 import {ALL_BRAIN_ZONES, ALL_RHYTHM_TYPES, RHYTHM_TYPES_BY_BRAIN_ZONE} from '../../types/eegTypes.ts';
 import type {BrainZone, RhythmType} from "../../types/eegTypes.ts";
 
+interface ConfigurationPageProps {
+    isAnalyzing?: boolean;
+    onSetAnalyzing?: (analyzing: boolean) => void;
+    onRunAnalysis?: (data: EEGAnalysisFormData) => void;
+}
 
-const ConfigurationPage = () => {
+const ConfigurationPage = (
+    {
+        isAnalyzing = false,
+        onSetAnalyzing = (_) => {},
+        onRunAnalysis = (_) => {}
+    }: ConfigurationPageProps
+) => {
     const [mode, setMode] = useState<AnalysisMode>("GROUP");
     const { t } = useTranslation();
     const [files, setFiles] = useState<EEGFileConfig[]>([]);
@@ -54,6 +64,23 @@ const ConfigurationPage = () => {
         setBrainZone(newBrainZone);
         setSelectedRhythms(RHYTHM_TYPES_BY_BRAIN_ZONE[newBrainZone]);
     };
+    const runAnalysis = () => {
+        const formData: EEGAnalysisFormData =
+            (mode === 'GROUP') ?
+                {
+                    analysisMode: 'GROUP',
+                    files: files,
+                    brainZone: brainZone,
+                    rhythm: (selectedRhythms.length > 0) ? selectedRhythms[0] : 'ALPHA'
+                } : {
+                    analysisMode: 'SINGLE',
+                    file: files[0],
+                    brainZone: brainZone,
+                    rhythms: selectedRhythms
+                };
+        onSetAnalyzing(true);
+        onRunAnalysis(formData);
+    }
 
     return (
         <>
@@ -92,7 +119,7 @@ const ConfigurationPage = () => {
                             onChange={(e) => handleBrainZoneChange(e.target.value as BrainZone)}
                         >
                             {ALL_BRAIN_ZONES.map(z =>
-                                <MenuItem key={z} value={z}>{t(`config_rhythm_brainZone_${z}`)}</MenuItem>
+                                <MenuItem key={z} value={z}>{t(`misc_brainZone_${z}`)}</MenuItem>
                             )}
                         </Select>
                     </FormControl>
@@ -114,14 +141,32 @@ const ConfigurationPage = () => {
                             renderValue={(selected) => (
                                 <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
                                     {(Array.isArray(selected) ? selected : [selected]).map((value) => (
-                                        <Chip key={value} label={value} size="small" />
+                                        <Chip
+                                            key={value}
+                                            label={t(`misc_rhythm_${value}`)}
+                                            size="small"
+                                        />
                                     ))}
                                 </Box>
                             )}
                         >
-                            {ALL_RHYTHM_TYPES.map(r => <MenuItem key={r} value={r}>{r}</MenuItem>)}
+                            {ALL_RHYTHM_TYPES.map(r =>
+                                <MenuItem key={r} value={r}>{t(`misc_rhythm_${r}`)}</MenuItem>
+                            )}
                         </Select>
                     </FormControl>
+
+                    <Button
+                        variant="contained"
+                        size="large"
+                        fullWidth
+                        disabled={files.length === 0 || isAnalyzing || selectedRhythms.length === 0}
+                        onClick={runAnalysis}
+                        startIcon={<Play />}
+                        sx={{ mt: 2 }}
+                    >
+                        {isAnalyzing ? '...' : t('config_submit')}
+                    </Button>
                 </Stack>
             </ConfigurationBlock>
         </>
