@@ -1,4 +1,4 @@
-// src/components/ModeConfiguration.tsx
+// src/components/ModeConfigurationBlock.tsx
 
 import * as React from 'react';
 import { Paper, Tabs, Tab, Box, Typography } from "@mui/material";
@@ -7,11 +7,14 @@ import { AnalysisMode } from '../../types/configTypes'; // 👈 Import the const
 
 // Define the component props
 interface ModeConfigurationProps {
+    mode?: AnalysisMode,
     // Callback function to send the new mode (GROUP or SINGLE) back to the parent
     onModeChange: (mode: AnalysisMode) => void;
 }
 
-const ModeConfiguration: React.FC<ModeConfigurationProps> = ({ onModeChange }) => {
+const ModeConfigurationBlock: React.FC<ModeConfigurationProps> = (
+    { mode = AnalysisMode.GROUP, onModeChange }
+) => {
     const { t } = useTranslation();
 
     // Local state for the selected tab index (0 for Group, 1 for Single File)
@@ -27,7 +30,7 @@ const ModeConfiguration: React.FC<ModeConfigurationProps> = ({ onModeChange }) =
 
     // Determine the descriptive text based on the current tab value
     // We use dynamic translation keys here: 'mode.group' or 'mode.single'
-    const descriptionKey = tabValue === 0 ? 'mode_description_group' : 'mode_description_single';
+    const descriptionKey = tabValue === 0 ? 'config_mode_description_group' : 'config_mode_description_single';
 
     return (
         <Paper sx={{ overflow: 'hidden' }}>
@@ -39,8 +42,8 @@ const ModeConfiguration: React.FC<ModeConfigurationProps> = ({ onModeChange }) =
                 textColor="primary"
             >
                 {/* 1. Use translation for the Tab labels */}
-                <Tab label={t('mode_label_group')} />
-                <Tab label={t('mode_label_single')} />
+                <Tab label={t('config_mode_label_group')} />
+                <Tab label={t('config_mode_label_single')} />
             </Tabs>
             <Box sx={{ p: 2 }}>
                 <Typography variant="caption" color="text.secondary">
@@ -52,4 +55,4 @@ const ModeConfiguration: React.FC<ModeConfigurationProps> = ({ onModeChange }) =
     );
 };
 
-export default ModeConfiguration;
+export default ModeConfigurationBlock;
