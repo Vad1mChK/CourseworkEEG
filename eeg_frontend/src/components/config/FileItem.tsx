@@ -28,10 +28,10 @@ const FileItem = ({
     return (
         <Paper sx={{ p: 2, mb: 1, backgroundColor: 'rgba(255,255,255,0.02)' }}>
             <Grid container spacing={2} alignItems="center">
-                <Grid item xs={1} component="div">
+                <Grid component="div">
                     <FileText size={20} color="#00e5ff" />
                 </Grid>
-                <Grid item xs={4} component="div">
+                <Grid component="div">
                     <Typography variant="body2" noWrap sx={{ fontWeight: 500 }}>
                         {file.filename}
                     </Typography>
@@ -39,7 +39,7 @@ const FileItem = ({
                         {formatFileSize(file.rawFile?.size)}
                     </Typography>
                 </Grid>
-                <Grid item xs={5} component="div">
+                <Grid component="div">
                     <TextField
                         fullWidth
                         size="small"
@@ -49,7 +49,7 @@ const FileItem = ({
                         variant="outlined"
                     />
                 </Grid>
-                <Grid item xs={2} component="div" sx={{ display: 'flex', justifyContent: 'flex-end' }}>
+                <Grid component="div" sx={{ display: 'flex', justifyContent: 'flex-end' }}>
                     <IconButton size="small" onClick={() => setExpanded(!expanded)}>
                         <Settings size={18} />
                     </IconButton>
@@ -62,7 +62,7 @@ const FileItem = ({
             {expanded && (
                 <Box sx={{ mt: 2, pt: 2, borderTop: '1px solid rgba(255,255,255,0.1)' }}>
                     <Grid container spacing={2}>
-                        <Grid item xs={6} component="div">
+                        <Grid component="div">
                             <TextField
                                 fullWidth size="small"
                                 label={t('config_file_itemTimeCol')}
@@ -70,7 +70,7 @@ const FileItem = ({
                                 onChange={(e) => onUpdate(file.id, 'timeColumn', e.target.value)}
                             />
                         </Grid>
-                        <Grid item xs={6} component="div">
+                        <Grid component="div">
                             <TextField
                                 fullWidth size="small"
                                 label={t('config_file_itemAmplitudeCol')}
