@@ -4,6 +4,8 @@ import { initReactI18next } from 'react-i18next';
 import LanguageDetector from 'i18next-browser-languagedetector';
 import HttpBackend from 'i18next-http-backend';
 
+const PUBLIC_BASE_PATH = import.meta.env.BASE_URL || '/';
+
 i18n
     // Load translation files via http (needed for production)
     .use(HttpBackend)
@@ -19,7 +21,7 @@ i18n
 
         // Configuration for the HTTP Backend to load translation files
         backend: {
-            loadPath: '/locales/{{lng}}/{{ns}}.json',
+            loadPath: `${PUBLIC_BASE_PATH}locales/{{lng}}/{{ns}}.json`,
         },
 
         interpolation: {
