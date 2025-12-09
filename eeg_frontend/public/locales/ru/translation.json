@@ -7,6 +7,7 @@
   "config_mode_description_group": "Анализ группы файлов (одинаковый ритм)",
   "config_mode_description_single": "Анализ одного файла (много ритмов)",
   "config_file_upload": "Загрузка данных",
+  "config_file_noFilesSelected": "Не выбрано ни одного файла",
   "config_file_dropzoneDropText": "Перетащите сюда .CSV-файлы с ЭЭГ",
   "config_file_dropzoneClickText": "Нажмите, чтобы добавить .CSV-файлы с ЭЭГ",
   "config_file_itemExperimentName": "Имя эксперимента",

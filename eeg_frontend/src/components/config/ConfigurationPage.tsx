@@ -1,15 +1,15 @@
 import React, { useState } from "react";
 import type { AnalysisMode, EEGFileConfig, EEGAnalysisFormData } from "../../types/configTypes.ts";
 import { useTranslation } from "react-i18next";
-import {Box, Button, Chip, FormControl, InputLabel, MenuItem, Select, Stack} from "@mui/material";
+import { Box, Button, Chip, FormControl, InputLabel, MenuItem, Select, Stack, FormHelperText } from "@mui/material"; // Added FormHelperText
 
 import ModeConfigurationBlock from "./ModeConfigurationBlock.tsx";
 import ConfigurationBlock from "./ConfigurationBlock.tsx";
-import {Activity, Play, Upload} from "lucide-react";
+import { Activity, Play, Upload } from "lucide-react";
 import FileDropzone from "./FileDropzone.tsx";
 import FileItem from "./FileItem.tsx";
-import {ALL_BRAIN_ZONES, ALL_RHYTHM_TYPES, RHYTHM_TYPES_BY_BRAIN_ZONE} from '../../types/eegTypes.ts';
-import type {BrainZone, RhythmType} from "../../types/eegTypes.ts";
+import { ALL_BRAIN_ZONES, ALL_RHYTHM_TYPES, RHYTHM_TYPES_BY_BRAIN_ZONE } from '../../types/eegTypes.ts';
+import type { BrainZone, RhythmType } from '../../types/eegTypes.ts';
 
 interface ConfigurationPageProps {
     isAnalyzing?: boolean;
@@ -17,86 +17,109 @@ interface ConfigurationPageProps {
     onRunAnalysis?: (data: EEGAnalysisFormData) => void;
 }
 
-const ConfigurationPage = (
-    {
-        isAnalyzing = false,
-        onSetAnalyzing = (_) => {},
-        onRunAnalysis = (_) => {}
-    }: ConfigurationPageProps
-) => {
+const ConfigurationPage = ({
+                               isAnalyzing = false,
+                               onSetAnalyzing = (_) => {},
+                               onRunAnalysis = (_) => {}
+                           }: ConfigurationPageProps) => {
     const [mode, setMode] = useState<AnalysisMode>("GROUP");
     const { t } = useTranslation();
     const [files, setFiles] = useState<EEGFileConfig[]>([]);
+
+    // Default to Frontal
     const [brainZone, setBrainZone] = useState<BrainZone>("FRONTAL");
+
+    // Initialize with the defaults for Frontal
     const [selectedRhythms, setSelectedRhythms] = useState<RhythmType[]>(
-        RHYTHM_TYPES_BY_BRAIN_ZONE[brainZone]
+        [RHYTHM_TYPES_BY_BRAIN_ZONE["FRONTAL"][0]]
     );
 
-    // 🚨 FIX 1: Change the function signature to accept a FileList 🚨
     const handleFileUpload = (fileList: FileList) => {
-        // No need to check for e.target.files, the FileDropzone ensures we get a FileList
         if (fileList.length === 0) return;
-        // Convert FileList to Array and map to EEGFileConfig
+
         const newFiles = Array.from(fileList).map(f => ({
             id: Math.random().toString(36).substr(2, 9),
             filename: f.name,
-            experimentName: f.name.replace('.csv', '').replace('.txt', ''), // Handle both extensions
+            experimentName: f.name.replace(/\.(csv|txt)$/i, ''), // Regex matches both extensions case-insensitive
             timeColumn: 'Time',
             amplitudeColumn: 'A0',
             rawFile: f,
             serverId: null,
         }));
-        if (mode === 'SINGLE' && newFiles.length > 0) {
-            // SINGLE mode: Replace all files with the first new one
+
+        if (mode === 'SINGLE') {
+            // In Single mode, we only keep the NEWEST file if multiple were dropped, or just the one.
+            // (Previous logic was a bit ambiguous if fileList had >1 items)
             setFiles([newFiles[0]]);
         } else {
-            // GROUP mode: Append new files
             setFiles(prev => [...prev, ...newFiles]);
         }
     };
+
     const updateFile = (id: string, field: keyof EEGFileConfig, value: any) => {
         setFiles(files.map(f => f.id === id ? { ...f, [field]: value } : f));
     };
+
     const removeFile = (id: string) => {
         setFiles(files.filter(f => f.id !== id));
     };
+
     const handleBrainZoneChange = (newBrainZone: BrainZone) => {
         setBrainZone(newBrainZone);
+        // Reset rhythms to the default for this zone when zone changes
+        // This is good UX so users don't see 'Occipital' with 'Frontal' rhythms selected
         setSelectedRhythms(RHYTHM_TYPES_BY_BRAIN_ZONE[newBrainZone]);
     };
+
     const runAnalysis = () => {
-        const formData: EEGAnalysisFormData =
-            (mode === 'GROUP') ?
-                {
-                    analysisMode: 'GROUP',
-                    files: files,
-                    brainZone: brainZone,
-                    rhythm: (selectedRhythms.length > 0) ? selectedRhythms[0] : 'ALPHA'
-                } : {
-                    analysisMode: 'SINGLE',
-                    file: files[0],
-                    brainZone: brainZone,
-                    rhythms: selectedRhythms
-                };
-        onSetAnalyzing(true);
-        onRunAnalysis(formData);
+        if (files.length === 0) return;
+
+        // Validation logic
+        if (mode === 'GROUP') {
+            // Strict check: Group mode must have exactly 1 rhythm
+            const targetRhythm = selectedRhythms[0];
+            if (!targetRhythm) return;
+
+            const formData: EEGAnalysisFormData = {
+                analysisMode: 'GROUP',
+                files: files,
+                brainZone: brainZone,
+                rhythm: targetRhythm
+            };
+            onSetAnalyzing(true);
+            onRunAnalysis(formData);
+
+        } else {
+            // Single mode validation
+            if (selectedRhythms.length === 0) return;
+
+            const formData: EEGAnalysisFormData = {
+                analysisMode: 'SINGLE',
+                file: files[0],
+                brainZone: brainZone,
+                rhythms: selectedRhythms
+            };
+            onSetAnalyzing(true);
+            onRunAnalysis(formData);
+        }
     }
 
     return (
         <>
             <ModeConfigurationBlock mode={mode} onModeChange={setMode}/>
+
             <ConfigurationBlock
                 headerText={t('config_file_upload')}
                 headerIcon={<Upload size={18} />}
             >
                 <FileDropzone
                     isMultiple={mode === "GROUP"}
-                    onFileUpload={handleFileUpload} // Passes the FileList
+                    onFileUpload={handleFileUpload}
                     accept={".txt,.csv"}
                 />
 
                 <Box sx={{ mt: 2, maxHeight: 300, overflowY: 'auto' }}>
-                    { files.map(f => ( // 🚨 FIX 2: Use parentheses () instead of curly braces {}
+                    {files.map(f => (
                         <FileItem
                             key={f.id}
                             file={f}
@@ -104,8 +127,14 @@ const ConfigurationPage = (
                             onRemove={removeFile}
                         />
                     ))}
+                    {files.length === 0 && (
+                        <Box p={2} textAlign="center" color="text.secondary">
+                            {t('config_file_noFilesSelected')}
+                        </Box>
+                    )}
                 </Box>
             </ConfigurationBlock>
+
             <ConfigurationBlock
                 headerText={t('config_rhythm')}
                 headerIcon={<Activity size={18} />}
@@ -125,33 +154,45 @@ const ConfigurationPage = (
                     </FormControl>
 
                     <FormControl fullWidth size="small">
-                        <InputLabel>{(mode === "GROUP") ?
-                            t('config_rhythm_targetRhythm') :
-                            t('config_rhythm_targetRhythms')}</InputLabel>
+                        <InputLabel id="rhythm-select-label">
+                            {(mode === "GROUP") ? t('config_rhythm_targetRhythm') : t('config_rhythm_targetRhythms')}
+                        </InputLabel>
                         <Select
+                            labelId="rhythm-select-label"
                             multiple={(mode === "SINGLE")}
+                            // Logic: In GROUP mode, Value is a String. In SINGLE mode, Value is an Array.
                             value={(mode === "GROUP") ? (selectedRhythms[0] || '') : selectedRhythms}
-                            label={(mode === "GROUP") ?
-                                t('config_rhythm_targetRhythm') :
-                                t('config_rhythm_targetRhythms')}
+                            label={(mode === "GROUP") ? t('config_rhythm_targetRhythm') : t('config_rhythm_targetRhythms')}
+
                             onChange={(e) => {
                                 const val = e.target.value;
-                                setSelectedRhythms(typeof val === 'string' ? [val as RhythmType] : val as RhythmType[]);
+                                // Force internal state to always be an array for consistency
+                                if (typeof val === 'string') {
+                                    setSelectedRhythms([val as RhythmType]);
+                                } else {
+                                    setSelectedRhythms(val as RhythmType[]);
+                                }
                             }}
                             renderValue={(selected) => (
                                 <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-                                    {(Array.isArray(selected) ? selected : [selected]).map((value) => (
-                                        <Chip
-                                            key={value}
-                                            label={t(`misc_rhythm_${value}`)}
-                                            size="small"
-                                        />
-                                    ))}
+                                    {/* Handle rendering for both string (Group) and array (Single) values */}
+                                    {(Array.isArray(selected) ? selected : [selected]).map((value) => {
+                                        if (!value) return null; // Guard against empty string
+                                        return (
+                                            <Chip
+                                                key={value}
+                                                label={t(`misc_rhythm_${value}`)}
+                                                size="small"
+                                            />
+                                        )
+                                    })}
                                 </Box>
                             )}
                         >
                             {ALL_RHYTHM_TYPES.map(r =>
-                                <MenuItem key={r} value={r}>{t(`misc_rhythm_${r}`)}</MenuItem>
+                                <MenuItem key={r} value={r}>
+                                    {t(`misc_rhythm_${r}`)}
+                                </MenuItem>
                             )}
                         </Select>
                     </FormControl>
@@ -160,7 +201,14 @@ const ConfigurationPage = (
                         variant="contained"
                         size="large"
                         fullWidth
-                        disabled={files.length === 0 || isAnalyzing || selectedRhythms.length === 0}
+                        // STRICTER DISABLE LOGIC
+                        disabled={
+                            files.length === 0 ||
+                            // isAnalyzing ||
+                            selectedRhythms.length === 0 ||
+                            (mode === 'GROUP' && selectedRhythms.length !== 1) ||
+                            (mode === 'SINGLE' && files.length !== 1)
+                        }
                         onClick={runAnalysis}
                         startIcon={<Play />}
                         sx={{ mt: 2 }}

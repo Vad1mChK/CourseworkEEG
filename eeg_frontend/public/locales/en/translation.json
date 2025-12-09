@@ -7,6 +7,7 @@
   "config_mode_description_group": "Group analysis (same rhythm)",
   "config_mode_description_single": "Single file analysis (multiple rhythms)",
   "config_file_upload": "Upload data",
+  "config_file_noFilesSelected": "No files selected",
   "config_file_dropzoneDropText": "Drag and drop EEG .CSV files here",
   "config_file_dropzoneClickText": "Click to add EEG .CSV files here",
   "config_file_itemExperimentName": "Experiment Name",
