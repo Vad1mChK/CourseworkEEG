@@ -10,6 +10,9 @@ const RhythmType = {
     MU: 'MU'        // 8–13 Hz (Associated with motor inhibition)
 } as const;
 const ALL_RHYTHM_TYPES = Object.values(RhythmType) as RhythmType[];
+const isRhythmType = (value: any): value is RhythmType => {
+    return ALL_RHYTHM_TYPES.includes(value);
+};
 
 // --- BRAIN ZONES ---
 const BrainZone = {
@@ -72,6 +75,7 @@ export type { RhythmBand };
 export {
     ALL_BRAIN_ZONES,
     ALL_RHYTHM_TYPES,
+    isRhythmType,
     DEFAULT_RHYTHM_BANDS_CONFIG as DEFAULT_RHYTHM_BANDS,
     RHYTHM_TYPES_BY_BRAIN_ZONE
 };

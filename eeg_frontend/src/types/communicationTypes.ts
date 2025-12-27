@@ -18,8 +18,10 @@ interface EEGGroupAnalysisRequest {
 }
 type EEGAnalysisRequest = EEGSingleAnalysisRequest | EEGGroupAnalysisRequest;
 
-interface EEGGroupAnalysisResponse {
+interface EEGBaseAnalysisResponse {
     analysisId: string;
+}
+interface EEGGroupAnalysisResponse extends EEGBaseAnalysisResponse {
     analysisMode: typeof AnalysisMode.GROUP;
     experimentNames: string[],
     rhythm: RhythmType;
@@ -27,14 +29,13 @@ interface EEGGroupAnalysisResponse {
     relativePowers: [string, number][];
     dataByExperiment: Record<string, EEGPlotPair>;
 }
-interface EEGSingleAnalysisResponse {
-    analysisId: string;
+interface EEGSingleAnalysisResponse extends EEGBaseAnalysisResponse {
     analysisMode: typeof AnalysisMode.SINGLE;
     experimentName: string,
     rhythms: RhythmType[];
     absolutePowers: [RhythmType, number][];
     relativePowers: [RhythmType, number][];
-    dataByRhythm: Record<RhythmType, EEGPlotPair>;
+    dataByRhythm: Partial<Record<RhythmType, EEGPlotPair>>;
 }
 type EEGAnalysisResponse = EEGGroupAnalysisResponse | EEGSingleAnalysisResponse;
 

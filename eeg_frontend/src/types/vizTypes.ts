@@ -1,7 +1,7 @@
 // src/types/vizTypes.ts
 
 type MuiColorName = 'primary' | 'secondary' | 'error' | 'warning' | 'info' | 'success';
-type PreferredColor = string | MuiColorName;
+export type PreferredColor = string | MuiColorName;
 
 // --- DEPRECATED/REPLACED: EEGDataPoint and EEGLineCurve ---
 // type EEGDataPoint = [number, number];
@@ -33,8 +33,18 @@ interface EEGLinePlot {
     yLogarithmic?: boolean;
     showLegend?: boolean;
     area?: boolean;
-    seriesMetadata: EEGSeriesMetadata[];
+    seriesMetadata?: EEGSeriesMetadata[];
     data: EEGCombinedDataPoint[];
+}
+
+export interface EEGBarPlot {
+    labels: string[];
+    values: number[];
+    preferredColor?: PreferredColor;
+    xAxisName?: string;
+    yAxisName?: string;
+    yMin?: number | null;
+    yMax?: number | null;
 }
 
 interface EEGPlotPair {

@@ -20,8 +20,36 @@ export default function App(){
                 <AppHeader headerText={t('header_appName')} resetText={t('header_resetBtn')}/>
                 <AppMainContainer>
                     {/*<ConfigurationPage />*/}
-                    <ResultsPage />
-                    <UselessComponent />
+                    <ResultsPage analysis={{
+                        analysisId: 'uuid0',
+                        analysisMode: "SINGLE",
+                        experimentName: 'игра в mega man 4',
+                        rhythms: ['ALPHA', 'BETA', 'DELTA', 'THETA'],
+                        absolutePowers: [['ALPHA', 1], ['BETA', 9], ['DELTA', 7], ['THETA', 6]],
+                        relativePowers: [['ALPHA', 0.2], ['BETA', 0.45], ['DELTA', 0.3], ['THETA', 0.15]],
+                        dataByRhythm: {
+                            'ALPHA': {
+                                psdPlot: {
+                                    data: [
+                                        {x: 0, psd: 1},
+                                        {x: 1, psd: 0.5},
+                                        {x: 2, psd: 0.2},
+                                        {x: 3, psd: 0.1}
+                                    ]
+                                },
+                                signalPlot: {
+                                    data: [
+                                        {x: 0, raw: 2, filtered: 0},
+                                        {x: 1, raw: 3, filtered: 1},
+                                        {x: 2, raw: 2, filtered: 0},
+                                        {x: 3, raw: 1, filtered: -1},
+                                        {x: 4, raw: 2, filtered: 0},
+                                    ]
+                                }
+                            }
+                        }
+                    }}/>
+                    {/*<UselessComponent />*/}
                 </AppMainContainer>
                 <AppFooter footerText={t('footer_copyrightText')} />
             </RootContainer>
