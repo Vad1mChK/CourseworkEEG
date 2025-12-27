@@ -1,7 +1,7 @@
 // src/components/ModeConfigurationBlock.tsx
 
 import * as React from 'react';
-import { Paper, Tabs, Tab, Box, Typography } from "@mui/material";
+import {Paper, Tabs, Tab, Box, Typography, Tooltip} from "@mui/material";
 import { useTranslation } from 'react-i18next';
 import type { AnalysisMode } from '../../types/configTypes'; // 👈 Import the constant and type
 
@@ -42,8 +42,12 @@ const ModeConfigurationBlock: React.FC<ModeConfigurationProps> = (
                 textColor="primary"
             >
                 {/* 1. Use translation for the Tab labels */}
-                <Tab label={t('config_mode_label_group')} />
-                <Tab label={t('config_mode_label_single')} />
+                <Tooltip title={t('config_mode_description_group')}>
+                    <Tab label={t('config_mode_label_group')} />
+                </Tooltip>
+                <Tooltip title={t('config_mode_description_single')}>
+                    <Tab label={t('config_mode_label_single')} />
+                </Tooltip>
             </Tabs>
             <Box sx={{ p: 2 }}>
                 <Typography variant="caption" color="text.secondary">

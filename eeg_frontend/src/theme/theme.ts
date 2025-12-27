@@ -5,6 +5,7 @@ const darkTheme = createTheme({
         mode: 'dark',
         primary: { main: '#00e5ff' },
         secondary: { main: '#f50057' },
+        warning: { main: '#ffc400' },
         background: { default: '#0a0e17', paper: '#111827' },
         text: { primary: '#e2e8f0', secondary: '#94a3b8' },
     },

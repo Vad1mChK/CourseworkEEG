@@ -1,7 +1,7 @@
 import {useTranslation} from "react-i18next";
 import type {EEGFileConfig} from "../../types/configTypes.ts";
 import React, {useState} from "react";
-import {Box, Grid, IconButton, Paper, TextField, Typography} from "@mui/material";
+import {Box, Grid, IconButton, Paper, TextField, Typography, Tooltip} from "@mui/material";
 import {FileText, Settings, Trash2} from "lucide-react";
 
 
@@ -32,9 +32,11 @@ const FileItem = ({
                     <FileText size={20} color="#00e5ff" />
                 </Grid>
                 <Grid component="div">
-                    <Typography variant="body2" noWrap sx={{ fontWeight: 500 }}>
-                        {file.filename}
-                    </Typography>
+                    <Tooltip title={`ID: #${file.id}`}>
+                        <Typography variant="body2" noWrap sx={{ fontWeight: 500 }}>
+                            {file.filename}
+                        </Typography>
+                    </Tooltip>
                     <Typography variant="caption" color="text.secondary">
                         {formatFileSize(file.rawFile?.size)}
                     </Typography>

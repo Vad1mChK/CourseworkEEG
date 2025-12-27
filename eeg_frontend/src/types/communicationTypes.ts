@@ -1,5 +1,6 @@
 import type {BrainZone, RhythmType} from "./eegTypes.ts";
 import type {AnalysisMode, EEGFileConfig} from "./configTypes.ts";
+import type {EEGPlotPair} from "./vizTypes.ts";
 
 interface EEGSingleAnalysisRequest {
     analysisId: string;  // e.g. generated UUID
@@ -17,25 +18,6 @@ interface EEGGroupAnalysisRequest {
 }
 type EEGAnalysisRequest = EEGSingleAnalysisRequest | EEGGroupAnalysisRequest;
 
-type EEGDataPoint = [number, number];
-interface EEGLineCurve {
-    legend?: string | null;
-    preferredColor?: string;
-    area?: boolean;
-    dataPoints: EEGDataPoint[]; // It may be reasonable to limit the amount of data points sent back for interactive viz
-}
-interface EEGLinePlot {
-    xMin?: number | null;
-    xMax?: number | null;
-    yMin?: number | null;
-    yMax?: number | null;
-    showLegend?: boolean;
-    curves: EEGLineCurve[];
-}
-interface EEGPlotPair {
-    psdPlot: EEGLinePlot;
-    signalPlot: EEGLinePlot;
-}
 interface EEGGroupAnalysisResponse {
     analysisId: string;
     analysisMode: typeof AnalysisMode.GROUP;
@@ -56,4 +38,7 @@ interface EEGSingleAnalysisResponse {
 }
 type EEGAnalysisResponse = EEGGroupAnalysisResponse | EEGSingleAnalysisResponse;
 
-export type { EEGAnalysisRequest, EEGAnalysisResponse };
+export type {
+    EEGAnalysisRequest,
+    EEGAnalysisResponse
+};
