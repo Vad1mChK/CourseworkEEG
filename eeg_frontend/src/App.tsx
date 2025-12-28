@@ -23,16 +23,16 @@ export default function App(){
     const abortControllerRef = useRef<AbortController | null>(null);
 
     const apiClient = useMemo(() => createApiClient({
-        baseUrl: import.meta.env.VITE_API_BASE_URL,
+        baseUrl: import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:3000',
         analysisEndpoint: import.meta.env.VITE_API_ANALYSIS_ENDPOINT ?? '/analyze',
     }), []);
 
     useEffect(() => {
         const statusTitles = {
-            'IDLE': '',
-            'LOADING': '',
-            'SUCCESS': '',
-            'ERROR': ''
+            'IDLE': t('titles_idle'),
+            'LOADING': t('titles_loading'),
+            'SUCCESS': t('titles_success'),
+            'ERROR': t('titles_error')
         };
 
         if (document) document.title = statusTitles[appState.status];

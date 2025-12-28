@@ -50,6 +50,11 @@
 
   "footer_copyrightText": "\u00a9 2025 NeuroAnalyzr. All rights reserved.",
 
+  "titles_idle": "NeuroAnalyzr",
+  "titles_loading": "NeuroAnalyzr — Loading",
+  "titles_success": "NeuroAnalyzr — Results",
+  "titles_error": "NeuroAnalyzr —; Error",
+
   "misc_brainZone_FRONTAL": "Frontal",
   "misc_brainZone_PARIETAL": "Parietal",
   "misc_brainZone_CENTRAL": "Central",
