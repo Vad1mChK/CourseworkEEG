@@ -19,6 +19,9 @@
   "config_rhythm_targetRhythms": "Целевые ритмы",
   "config_submit": "Анализировать",
 
+  "loading_header": "Загрузка...",
+  "loading_analysis_mainText": "Подождите, анализ загружается...",
+
   "results_reportHeader_single": "Отчёт об анализе (одна запись, по ритмам)",
   "results_reportHeader_single_rhythmList": "Ритмы: {{rhythmList}}",
   "results_reportHeader_group": "Отчёт об анализе (группа записей)",
@@ -43,6 +46,8 @@
   "results_linePlotPair_legend_raw": "Необработанный",
   "results_linePlotPair_legend_filtered": "Фильтрованный",
 
+  "errorResult_header": "Произошла ошибка",
+
   "footer_copyrightText": "\u00a9 2025 NeuroAnalyzr. Все права защищены.",
 
   "misc_brainZone_FRONTAL": "Лобная",
@@ -58,5 +63,7 @@
   "misc_rhythm_KAPPA": "Каппа (κ)",
   "misc_rhythm_LAMBDA": "Лямбда (λ)",
   "misc_rhythm_MU": "Мю (μ)",
-  "misc_list_empty": "(пусто)"
+  "misc_list_empty": "(пусто)",
+  "misc_list_unavailable": "(недоступно)",
+  "misc_button_goHome": "Вернуться на главную"
 }

@@ -2,18 +2,18 @@ import type {BrainZone, RhythmType} from "./eegTypes.ts";
 import type {AnalysisMode, EEGFileConfig} from "./configTypes.ts";
 import type {EEGPlotPair} from "./vizTypes.ts";
 
-interface EEGSingleAnalysisRequest {
-    analysisId: string;  // e.g. generated UUID
+interface EEGBaseAnalysisRequest {
+    analysisId: string; // e.g. generated UUID
+    brainZone?: BrainZone;
+}
+interface EEGSingleAnalysisRequest extends EEGBaseAnalysisRequest {
     analysisMode: typeof AnalysisMode.SINGLE; // or AnalysisMode values
     file: EEGFileConfig;
-    brainZone?: BrainZone;
     rhythms: RhythmType[];
 }
-interface EEGGroupAnalysisRequest {
-    analysisId: string;
+interface EEGGroupAnalysisRequest extends EEGBaseAnalysisRequest {
     analysisMode: typeof AnalysisMode.GROUP;
     files: EEGFileConfig[];
-    brainZone?: BrainZone;
     rhythm: RhythmType;
 }
 type EEGAnalysisRequest = EEGSingleAnalysisRequest | EEGGroupAnalysisRequest;

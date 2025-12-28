@@ -6,9 +6,10 @@ import {useTranslation} from "react-i18next";
 interface AppHeaderProps {
     headerText: string;
     resetText: string;
+    onClick?: () => void;
 }
 
-const AppHeader = ({ headerText, resetText }: AppHeaderProps) => {
+const AppHeader = ({ headerText, resetText, onClick }: AppHeaderProps) => {
     const { i18n } = useTranslation();
     const currentLanguage = i18n.language || "ru";
     const handleLanguageChange = (event: SelectChangeEvent<string>) => {
@@ -20,8 +21,17 @@ const AppHeader = ({ headerText, resetText }: AppHeaderProps) => {
     return (
         <AppBar position="fixed" color="transparent" elevation={0} sx={{ borderBottom: '1px solid rgba(255,255,255,0.08)', bgcolor: 'background.default', zIndex: 1200 }}>
             <Toolbar>
-                <Brain color="#00e5ff" style={{ marginRight: 12 }} />
-                <Typography variant="h5" color="text.primary" sx={{ flexGrow: 1 }}>
+                <Brain
+                    color="#00e5ff"
+                    style={{ marginRight: 12 }}
+                    onClick={onClick}
+                />
+                <Typography
+                    variant="h5"
+                    color="text.primary"
+                    sx={{ flexGrow: 1 }}
+                    onClick={onClick}
+                >
                     {headerText}
                 </Typography>
 

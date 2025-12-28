@@ -19,6 +19,9 @@
   "config_rhythm_targetRhythms": "Target Rhythms",
   "config_submit": "Analyze",
 
+  "loading_header": "Loading...",
+  "loading_analysis_mainText": "Please wait, the analysis is loading...",
+
   "results_reportHeader_single": "Analysis report (single record, by rhythm)",
   "results_reportHeader_single_rhythmList": "Rhythms: {{rhythmList}}",
   "results_reportHeader_group": "Analysis report (group of records)",
@@ -43,6 +46,8 @@
   "results_linePlotPair_legend_raw": "Raw",
   "results_linePlotPair_legend_filtered": "Filtered",
 
+  "errorResult_header": "An error has occurred",
+
   "footer_copyrightText": "\u00a9 2025 NeuroAnalyzr. All rights reserved.",
 
   "misc_brainZone_FRONTAL": "Frontal",
@@ -59,5 +64,6 @@
   "misc_rhythm_LAMBDA": "Lambda (λ)",
   "misc_rhythm_MU": "Mu (μ)",
   "misc_list_empty": "(empty)",
-  "misc_list_unavailable": "(unavailable)"
+  "misc_list_unavailable": "(unavailable)",
+  "misc_button_goHome": "Go Home"
 }

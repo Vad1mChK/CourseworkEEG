@@ -1,17 +1,18 @@
 import ResultsBlock from "./ResultsBlock.tsx";
-import {BarChart2, BarChart2Icon, BarChartIcon, BrainCircuit, LineChartIcon, Microscope} from "lucide-react";
+import {BarChart2, BarChart2Icon, BarChartIcon, BrainCircuit, HomeIcon, LineChartIcon, Microscope} from "lucide-react";
 import LinePlotVisualizer from "./LinePlotVisualizer.tsx";
 import LinePlotPairBlock from "./LinePlotPairBlock.tsx";
 import type {EEGAnalysisResponse} from "../../types/communicationTypes.ts";
 import {t} from "i18next";
-import {Typography} from "@mui/material";
+import {Button, Typography} from "@mui/material";
 import BarPlotVisualizer from "./BarPlotVisualizer.tsx";
 import {ALL_RHYTHM_TYPES, isRhythmType, type RhythmType} from "../../types/eegTypes.ts";
 import BarPlotPairBlock from "./BarPlotPairBlock.tsx";
 import type {EEGPlotPair} from "../../types/vizTypes.ts";
 
 interface ResultsPageProps {
-    analysis: Partial<EEGAnalysisResponse>
+    analysis: Partial<EEGAnalysisResponse>,
+    onGoHome?: () => void
 }
 
 const localizeRhythm = (rhythm: RhythmType) => t(`misc_rhythm_${rhythm}`);
@@ -49,9 +50,7 @@ const elemMaxMinPower = <T extends (string | RhythmType)>(
     );
 };
 
-const ResultsPage = ({ analysis }: ResultsPageProps) => {
-    console.log(analysis)
-
+const ResultsPage = ({ analysis, onGoHome }: ResultsPageProps) => {
     return (
         <>
             {/* Header block */}
@@ -76,6 +75,14 @@ const ResultsPage = ({ analysis }: ResultsPageProps) => {
                                 t('misc_list_empty')
                     }
                 </Typography>}
+                {onGoHome && <Button
+                    variant="contained"
+                    size="large"
+                    fullWidth
+                    onClick={onGoHome}
+                    startIcon={<HomeIcon />}
+                    sx={{mt: 2}}
+                >{ t('misc_button_goHome') }</Button>}
             </ResultsBlock>
 
             {/* Absolute vs relative powers */}
