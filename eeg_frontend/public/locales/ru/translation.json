@@ -37,7 +37,7 @@
   "results_reportPower_maxPower": "Макс. мощность: {{name}} ({{value}})",
   "results_reportPower_minPower": "Мин. мощность: {{name}} ({{value}})",
   "results_linePlotPair_single_header": "Ритм: {{rhythm}}",
-  "results_linePlotPair_group_header": "Зксперимент: {{experimentName}}",
+  "results_linePlotPair_group_header": "Эксперимент: {{experimentName}}",
   "results_linePlotPair_axis_time": "Время",
   "results_linePlotPair_axis_frequency": "Частота",
   "results_linePlotPair_axis_psd": "Спектр. плотн. мощности",

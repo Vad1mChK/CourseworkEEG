@@ -52,6 +52,9 @@ export default function App(){
 
         try {
             const response = await apiClient.analyze(request, abController.signal);
+            // if (response.analysisId !== request.analysisId) {
+            //     throw new Error('request ID and response ID do not match');
+            // }
             setAppState({ status: 'SUCCESS', response: response });
         } catch (e) {
             if (e instanceof DOMException && e.name === 'AbortError') {

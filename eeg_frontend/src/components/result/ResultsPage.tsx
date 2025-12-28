@@ -147,6 +147,48 @@ const ResultsPage = ({ analysis, onGoHome }: ResultsPageProps) => {
                     }}
             />}
 
+            {analysis.analysisMode == "GROUP" && analysis.dataByExperiment &&
+                (Object.entries(analysis.dataByExperiment) as Array<[string, EEGPlotPair]>).map(
+                    ([experiment, plotPair], idx) =>
+                        <LinePlotPairBlock
+                            height={320}
+                            headerText={t('results_linePlotPair_group_header', { experimentName: experiment })}
+                            headerIcon={<LineChartIcon size={18}/>}
+                            plotPair={{
+                                psdPlot: {
+                                    xAxisName: t('results_linePlotPair_axis_frequency'),
+                                    yAxisName: t('results_linePlotPair_axis_psd'),
+                                    yLogarithmic: true,
+                                    seriesMetadata: [
+                                        {
+                                            dataKey: 'psd',
+                                            legend: t('results_linePlotPair_legend_psd'),
+                                            preferredColor: 'secondary'
+                                        }
+                                    ],
+                                    showLegend: true,
+                                    ...plotPair.psdPlot
+                                },
+                                signalPlot: {
+                                    xAxisName: t('results_linePlotPair_axis_time'),
+                                    yAxisName: t('results_linePlotPair_axis_amplitude'),
+                                    seriesMetadata: [
+                                        {dataKey: 'raw', legend: t('results_linePlotPair_legend_raw')},
+                                        {
+                                            dataKey: 'filtered',
+                                            legend: t('results_linePlotPair_legend_filtered'),
+                                            preferredColor: 'primary'
+                                        }
+                                    ],
+                                    showLegend: true,
+                                    ...plotPair.signalPlot
+                                }
+                            }}
+                            key={`${idx}_${experiment}`}
+                        />
+                )
+            }
+
             {analysis.analysisMode == "SINGLE" && analysis.dataByRhythm &&
                 (Object.entries(analysis.dataByRhythm) as Array<[RhythmType, EEGPlotPair]>).map(
                     ([rhythm, plotPair], idx) =>
