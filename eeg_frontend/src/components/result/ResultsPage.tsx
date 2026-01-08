@@ -91,7 +91,9 @@ const ResultsPage = ({ analysis, onGoHome }: ResultsPageProps) => {
                         analysis.analysisMode === "SINGLE" ?
                             t('results_reportPower_single', { experimentName: analysis.experimentName }) :
                             analysis.analysisMode === "GROUP" ?
-                                t('results_reportPower_group', { rhythm: analysis.rhythm }) :
+                                t('results_reportPower_group', {
+                                    rhythm: analysis.rhythm ? localizeRhythm(analysis.rhythm) : analysis.rhythm
+                                }) :
                                 t('results_reportPower_unknown')
                     }
                     headerIcon={<BarChart2Icon size={18}/>}
