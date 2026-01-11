@@ -13,6 +13,7 @@ import ErrorPage from "./components/errorstate/ErrorPage.tsx";
 import {createApiClient, eegFormDataToRequest} from "./communication/apiClient.ts";
 import type {EEGAnalysisFormData} from "./types/configTypes.ts";
 import LoadingPage from "./components/loading/LoadingPage.tsx";
+import {printProfilingData, saveProfilingData} from "./util/profiling.ts";
 
 export default function App(){
     const { t, i18n } = useTranslation();
@@ -38,8 +39,13 @@ export default function App(){
         if (document) document.title = statusTitles[appState.status];
     }, [appState]);
 
+    useEffect(() => {
+        printProfilingData();
+    }, []);
+
     const runAnalysis = useCallback(async (formData: EEGAnalysisFormData) => {
         const request = eegFormDataToRequest(formData);
+        const t0 = performance.now();
 
         if (abortControllerRef.current) {
             abortControllerRef.current.abort();
@@ -56,7 +62,15 @@ export default function App(){
             //     throw new Error('request ID and response ID do not match');
             // }
             setAppState({ status: 'SUCCESS', response: response });
+
+            const t1 = performance.now();
+            console.info(`Analysis succeeded in ${((t1 - t0) / 1000).toFixed(6)} s`);
+            saveProfilingData(t1 - t0, 'SUCCESS');
         } catch (e) {
+            const t1 = performance.now();
+            console.error(`Analysis errored in ${((t1 - t0) / 1000).toFixed(6)} s`);
+            saveProfilingData(t1 - t0, 'ERROR');
+
             if (e instanceof DOMException && e.name === 'AbortError') {
                 setAppState({ status: 'IDLE' })
                 return;
@@ -108,7 +122,7 @@ export default function App(){
                         />
                     }
                 </AppMainContainer>
-                <AppFooter footerText={t('footer_copyrightText')} />
+                <AppFooter footerText={t('footer_copyrightText', { year: new Date().getFullYear() })} />
             </RootContainer>
         </ThemeProvider>
     );
