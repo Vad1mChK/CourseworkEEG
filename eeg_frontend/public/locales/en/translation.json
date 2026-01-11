@@ -48,7 +48,7 @@
 
   "errorResult_header": "An error has occurred",
 
-  "footer_copyrightText": "\u00a9 2025 NeuroAnalyzr. All rights reserved.",
+  "footer_copyrightText": "\u00a9 {{year}} NeuroAnalyzr. All rights reserved.",
 
   "titles_idle": "NeuroAnalyzr",
   "titles_loading": "NeuroAnalyzr — Loading",

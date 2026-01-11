@@ -48,7 +48,7 @@
 
   "errorResult_header": "Произошла ошибка",
 
-  "footer_copyrightText": "\u00a9 2025 NeuroAnalyzr. Все права защищены.",
+  "footer_copyrightText": "\u00a9 {{year}} NeuroAnalyzr. Все права защищены.",
 
   "titles_idle": "NeuroAnalyzr",
   "titles_loading": "NeuroAnalyzr — Загрузка",
