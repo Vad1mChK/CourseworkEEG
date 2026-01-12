@@ -1,4 +1,4 @@
-import React, {Profiler, useCallback, useEffect, useMemo, useRef, useState} from "react";
+import React, {useCallback, useEffect, useMemo, useRef, useState} from "react";
 import {darkTheme} from "./theme/theme.ts";
 import {ThemeProvider, CssBaseline} from "@mui/material";
 import RootContainer from "./components/toplevel/RootContainer.tsx";
@@ -17,7 +17,6 @@ import {
 } from "./types/configTypes.ts";
 import LoadingPage from "./components/loading/LoadingPage.tsx";
 import {printProfilingData, saveProfilingData} from "./util/profiling.ts";
-import {EEGAnalysisResponseUtils} from "./types/communicationTypes.ts";
 
 export default function App(){
     const { t, i18n } = useTranslation();
@@ -41,7 +40,7 @@ export default function App(){
         };
 
         if (document) document.title = statusTitles[appState.status];
-    }, [appState]);
+    }, [appState, t]);
 
     useEffect(() => {
         printProfilingData();
@@ -128,23 +127,10 @@ export default function App(){
                         <LoadingPage message={t('loading_analysis_mainText')}/>
                     }
                     {appState.status === 'SUCCESS' &&
-                        <Profiler id="ResultsPage" onRender={(id, phase, actualDuration) => {
-                                // We only care about the initial 'mount' duration
-                                if (phase === 'mount') {
-                                    saveProfilingData({
-                                        durationMs: actualDuration,
-                                        operationType: 'RENDER_RESULT',
-                                        status: 'SUCCESS',
-                                        plotPairsCount: EEGAnalysisResponseUtils.getPlotPairCount(appState.response),
-                                        dataPointsCount: EEGAnalysisResponseUtils.getTotalDataPointCount(appState.response),
-                                    });
-                                }
-                            }}>
-                            <ResultsPage
-                                analysis={appState.response}
-                                onGoHome={onGoHome}
-                            />
-                        </Profiler>
+                        <ResultsPage
+                            analysis={appState.response}
+                            onGoHome={onGoHome}
+                        />
                     }
                     {appState.status === 'ERROR' &&
                         <ErrorPage

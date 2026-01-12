@@ -1,14 +1,14 @@
 import ResultsBlock from "./ResultsBlock.tsx";
-import {BarChart2, BarChart2Icon, BarChartIcon, BrainCircuit, HomeIcon, LineChartIcon, Microscope} from "lucide-react";
-import LinePlotVisualizer from "./LinePlotVisualizer.tsx";
+import {BarChart2Icon, HomeIcon, LineChartIcon, Microscope} from "lucide-react";
 import LinePlotPairBlock from "./LinePlotPairBlock.tsx";
-import type {EEGAnalysisResponse} from "../../types/communicationTypes.ts";
+import {type EEGAnalysisResponse, EEGAnalysisResponseUtils} from "../../types/communicationTypes.ts";
 import {t} from "i18next";
 import {Button, Typography} from "@mui/material";
-import BarPlotVisualizer from "./BarPlotVisualizer.tsx";
-import {ALL_RHYTHM_TYPES, isRhythmType, type RhythmType} from "../../types/eegTypes.ts";
+import {isRhythmType, type RhythmType} from "../../types/eegTypes.ts";
 import BarPlotPairBlock from "./BarPlotPairBlock.tsx";
 import type {EEGPlotPair} from "../../types/vizTypes.ts";
+import {useEffect} from "react";
+import {saveProfilingData} from "../../util/profiling.ts";
 
 interface ResultsPageProps {
     analysis: Partial<EEGAnalysisResponse>,
@@ -51,6 +51,27 @@ const elemMaxMinPower = <T extends (string | RhythmType)>(
 };
 
 const ResultsPage = ({ analysis, onGoHome }: ResultsPageProps) => {
+    // Inside a wrapper or the ResultsPage component itself
+    useEffect(() => {
+        const t0 = performance.now();
+
+        // RequestAnimationFrame ensures the browser has
+        // actually processed the render/paint
+        requestAnimationFrame(() => {
+            const t1 = performance.now();
+            const actualDuration = t1 - t0;
+
+            saveProfilingData({
+                durationMs: actualDuration,
+                operationType: 'RENDER_RESULT',
+                status: 'SUCCESS',
+                plotPairsCount: EEGAnalysisResponseUtils.getPlotPairCount(analysis),
+                dataPointsCount: EEGAnalysisResponseUtils.getTotalDataPointCount(analysis),
+            });
+        });
+    }, [analysis]); // Empty dependency array = run on mount
+
+
     return (
         <>
             {/* Header block */}

@@ -41,27 +41,44 @@ interface EEGSingleAnalysisResponse extends EEGBaseAnalysisResponse {
 type EEGAnalysisResponse = EEGGroupAnalysisResponse | EEGSingleAnalysisResponse;
 
 export const EEGAnalysisResponseUtils = {
-    getPlotPairCount: (response: EEGAnalysisResponse): number => (
-        response.analysisMode == 'GROUP' ?
-            Object.keys(response.dataByExperiment).length :
-            Object.keys(response.dataByRhythm).length
-    ),
-    getPlotPairDataPointCount: (plotPair: EEGPlotPair): number => {
-        const psdPlotLineCount = plotPair.psdPlot.data.length > 0 ?
-            (Object.values(plotPair.psdPlot.data[0]).length - 1) :
-            0;
-        const signalPlotLineCount = plotPair.signalPlot.data.length > 0 ?
-            (Object.values(plotPair.signalPlot.data[0]).length - 1) :
-            0;
-        return plotPair.psdPlot.data.length * psdPlotLineCount +
-            plotPair.signalPlot.data.length * signalPlotLineCount;
+    getPlotPairCount: (response: Partial<EEGAnalysisResponse>): number => {
+        if (response.analysisMode === 'GROUP') {
+            return Object.keys(response.dataByExperiment ?? {}).length;
+        }
+        if (response.analysisMode === 'SINGLE') {
+            return Object.keys(response.dataByRhythm ?? {}).length;
+        }
+        return 0;
     },
-    getTotalDataPointCount: (response: EEGAnalysisResponse): number => {
-        const powersDataPointCount = (response.absolutePowers.length + response.relativePowers.length);
-        const plotPairDataPointCount = response.analysisMode === 'GROUP' ?
-            sumBy(Object.values(response.dataByExperiment), EEGAnalysisResponseUtils.getPlotPairDataPointCount) :
-            sumBy(Object.values(response.dataByRhythm), EEGAnalysisResponseUtils.getPlotPairDataPointCount);
-        return powersDataPointCount + plotPairDataPointCount;
+
+    getPlotPairDataPointCount: (plotPair: EEGPlotPair | undefined): number => {
+        if (!plotPair) return 0;
+
+        // Count entries in PSD data (length of array * number of keys excluding 'frequency')
+        const psdData = plotPair.psdPlot?.data ?? [];
+        const psdLineCount = psdData.length > 0 ? (Object.keys(psdData[0]).length - 1) : 0;
+        const psdTotal = psdData.length * psdLineCount;
+
+        // Count entries in Signal data (length of array * number of keys excluding 'time')
+        const signalData = plotPair.signalPlot?.data ?? [];
+        const signalLineCount = signalData.length > 0 ? (Object.keys(signalData[0]).length - 1) : 0;
+        const signalTotal = signalData.length * signalLineCount;
+
+        return psdTotal + signalTotal;
+    },
+
+    getTotalDataPointCount: (response: Partial<EEGAnalysisResponse>): number => {
+        const powersCount = (response.absolutePowers?.length ?? 0) + (response.relativePowers?.length ?? 0);
+
+        const plotPairs = response.analysisMode === 'GROUP'
+            ? Object.values(response.dataByExperiment ?? {})
+            : (response.analysisMode === 'SINGLE' ? Object.values(response.dataByRhythm ?? {}) : []);
+
+        const plotPairsCount = sumBy(plotPairs, (pair) =>
+            EEGAnalysisResponseUtils.getPlotPairDataPointCount(pair as EEGPlotPair)
+        );
+
+        return powersCount + plotPairsCount;
     }
 };
 
