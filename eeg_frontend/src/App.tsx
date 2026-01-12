@@ -1,4 +1,4 @@
-import React, {useCallback, useEffect, useMemo, useRef, useState} from "react";
+import React, {Profiler, useCallback, useEffect, useMemo, useRef, useState} from "react";
 import {darkTheme} from "./theme/theme.ts";
 import {ThemeProvider, CssBaseline} from "@mui/material";
 import RootContainer from "./components/toplevel/RootContainer.tsx";
@@ -11,9 +11,13 @@ import ResultsPage from "./components/result/ResultsPage.tsx";
 import type {AppState} from "./types/appState.ts";
 import ErrorPage from "./components/errorstate/ErrorPage.tsx";
 import {createApiClient, eegFormDataToRequest} from "./communication/apiClient.ts";
-import type {EEGAnalysisFormData} from "./types/configTypes.ts";
+import {
+    type EEGAnalysisFormData,
+    EEGAnalysisFormDataUtils,
+} from "./types/configTypes.ts";
 import LoadingPage from "./components/loading/LoadingPage.tsx";
 import {printProfilingData, saveProfilingData} from "./util/profiling.ts";
+import {EEGAnalysisResponseUtils} from "./types/communicationTypes.ts";
 
 export default function App(){
     const { t, i18n } = useTranslation();
@@ -65,11 +69,25 @@ export default function App(){
 
             const t1 = performance.now();
             console.info(`Analysis succeeded in ${((t1 - t0) / 1000).toFixed(6)} s`);
-            saveProfilingData(t1 - t0, 'SUCCESS');
+            saveProfilingData(
+                {
+                    durationMs: (t1 - t0),
+                    operationType: 'COMMUNICATE',
+                    status: 'SUCCESS',
+                    fileCount: EEGAnalysisFormDataUtils.getFileCount(formData),
+                    totalFileSizeBytes: EEGAnalysisFormDataUtils.getFileTotalSize(formData)
+                }
+            );
         } catch (e) {
             const t1 = performance.now();
             console.error(`Analysis errored in ${((t1 - t0) / 1000).toFixed(6)} s`);
-            saveProfilingData(t1 - t0, 'ERROR');
+            saveProfilingData(
+                {
+                    durationMs: (t1 - t0),
+                    operationType: 'COMMUNICATE',
+                    status: 'ERROR'
+                }
+            );
 
             if (e instanceof DOMException && e.name === 'AbortError') {
                 setAppState({ status: 'IDLE' })
@@ -110,10 +128,23 @@ export default function App(){
                         <LoadingPage message={t('loading_analysis_mainText')}/>
                     }
                     {appState.status === 'SUCCESS' &&
-                        <ResultsPage
-                            analysis={appState.response}
-                            onGoHome={onGoHome}
-                        />
+                        <Profiler id="ResultsPage" onRender={(id, phase, actualDuration) => {
+                                // We only care about the initial 'mount' duration
+                                if (phase === 'mount') {
+                                    saveProfilingData({
+                                        durationMs: actualDuration,
+                                        operationType: 'RENDER_RESULT',
+                                        status: 'SUCCESS',
+                                        plotPairsCount: EEGAnalysisResponseUtils.getPlotPairCount(appState.response),
+                                        dataPointsCount: EEGAnalysisResponseUtils.getTotalDataPointCount(appState.response),
+                                    });
+                                }
+                            }}>
+                            <ResultsPage
+                                analysis={appState.response}
+                                onGoHome={onGoHome}
+                            />
+                        </Profiler>
                     }
                     {appState.status === 'ERROR' &&
                         <ErrorPage
