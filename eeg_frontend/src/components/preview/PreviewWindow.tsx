@@ -26,9 +26,7 @@ type InternalPreviewState =
 
 const PreviewWindow = ({
                            previewFormData,
-                           apiClient = createApiClient({
-                               baseUrl: import.meta.env.VITE_API_BASE_URL ?? "http://localhost:8000",
-                           })
+                           apiClient
                        }: PreviewWindowProps) => {
     const { t } = useTranslation();
 

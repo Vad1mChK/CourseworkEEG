@@ -123,7 +123,7 @@ export default function App(){
                 />
                 <AppMainContainer>
                     {appState.status === 'IDLE' &&
-                        <ConfigurationPage onRunAnalysis={runAnalysis} />
+                        <ConfigurationPage onRunAnalysis={runAnalysis} apiClient={apiClient} />
                     }
                     {appState.status === 'LOADING' &&
                         <LoadingPage message={t('loading_analysis_mainText')}/>
