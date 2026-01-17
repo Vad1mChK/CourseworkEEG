@@ -96,6 +96,11 @@ const ResultsPage = ({ analysis, onGoHome }: ResultsPageProps) => {
                                 t('misc_list_empty')
                     }
                 </Typography>}
+                {analysis.filterParams && <Typography>
+                    {
+                        `${t('config_filter_filterMin')}: ${analysis.filterParams.filterMin};`
+                    }
+                </Typography>}
                 {onGoHome && <Button
                     variant="contained"
                     size="large"
@@ -179,6 +184,8 @@ const ResultsPage = ({ analysis, onGoHome }: ResultsPageProps) => {
                             headerIcon={<LineChartIcon size={18}/>}
                             plotPair={{
                                 psdPlot: {
+                                    // xMin: EEGPlotUtils.calculateXMinMax(plotPair.psdPlot).min,
+                                    // xMax: EEGPlotUtils.calculateXMinMax(plotPair.psdPlot).max,
                                     xAxisName: t('results_linePlotPair_axis_frequency'),
                                     yAxisName: t('results_linePlotPair_axis_psd'),
                                     yLogarithmic: true,
@@ -193,6 +200,8 @@ const ResultsPage = ({ analysis, onGoHome }: ResultsPageProps) => {
                                     ...plotPair.psdPlot
                                 },
                                 signalPlot: {
+                                    // xMin: EEGPlotUtils.calculateXMinMax(plotPair.signalPlot).min,
+                                    // xMax: EEGPlotUtils.calculateXMinMax(plotPair.signalPlot).max,
                                     xAxisName: t('results_linePlotPair_axis_time'),
                                     yAxisName: t('results_linePlotPair_axis_amplitude'),
                                     seriesMetadata: [

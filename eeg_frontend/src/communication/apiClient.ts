@@ -24,11 +24,16 @@
 // - Tolerate common backend encodings:
 //     * dataByRhythm / dataByExperiment as object maps OR [key, value][] entries.
 //     * absolutePowers / relativePowers as [key, number][] OR Record<string, number>.
-import type { EEGAnalysisRequest, EEGAnalysisResponse } from "../types/communicationTypes.ts";
+import type {
+    EEGAnalysisRequest,
+    EEGAnalysisResponse,
+    EEGPreviewRequest,
+    EEGPreviewResponse
+} from "../types/communicationTypes.ts";
 import type { RhythmType } from "../types/eegTypes.ts";
 import { isRhythmType } from "../types/eegTypes.ts";
-import type { EEGPlotPair } from "../types/vizTypes.ts";
-import type {EEGAnalysisFormData} from "../types/configTypes.ts";
+import type {EEGLinePlot, EEGPlotPair} from "../types/vizTypes.ts";
+import type {EEGAnalysisFormData, EEGFilterParams, EEGPreviewFormData, PreviewMode} from "../types/configTypes.ts";
 import {generateUUID} from "../util/uuidUtils.ts";
 
 export interface ApiClientOptions {
@@ -36,12 +41,22 @@ export interface ApiClientOptions {
     baseUrl: string;
     /** Endpoint path like "/analysis" (default) */
     analysisEndpoint?: string;
+    previewEndpoint?: string;
     /** Inject custom fetch (tests) */
     fetchFn?: typeof fetch;
     /** Abort support */
     signal?: AbortSignal;
     /** If true, unknown rhythm keys from JSON are dropped instead of cast. */
     dropUnknownRhythms?: boolean;
+}
+
+/** Contract for any EEG API client implementation */
+export interface ApiClient {
+    /** * Sends an EEG analysis request and returns parsed results.
+     * Supports cancellation via AbortSignal.
+     */
+    analyze(request: EEGAnalysisRequest, signal?: AbortSignal): Promise<EEGAnalysisResponse>;
+    preview?(request: EEGPreviewRequest, signal?: AbortSignal): Promise<EEGPreviewResponse>;
 }
 
 export class ApiError extends Error {
@@ -57,7 +72,7 @@ export class ApiError extends Error {
     }
 }
 
-export function eegFormDataToRequest(formData: EEGAnalysisFormData): EEGAnalysisRequest {
+export function eegFormDataToAnalysisRequest(formData: EEGAnalysisFormData): EEGAnalysisRequest {
     const analysisId = generateUUID();
 
     if (formData.analysisMode === 'SINGLE') {
@@ -66,7 +81,8 @@ export function eegFormDataToRequest(formData: EEGAnalysisFormData): EEGAnalysis
             analysisMode: 'SINGLE',
             brainZone: formData.brainZone,
             file: formData.file,
-            rhythms: formData.rhythms
+            rhythms: formData.rhythms,
+            filterParams: formData.filterParams
         };
     }
     if (formData.analysisMode === 'GROUP') {
@@ -75,10 +91,28 @@ export function eegFormDataToRequest(formData: EEGAnalysisFormData): EEGAnalysis
             analysisMode: 'GROUP',
             brainZone: formData.brainZone,
             files: formData.files,
-            rhythm: formData.rhythm
+            rhythm: formData.rhythm,
+            filterParams: formData.filterParams
         };
     }
     throw new Error("Cannot create a request out of current form data: unknown analysis mode");
+}
+
+export function eegFormDataToPreviewRequest(
+    formData: EEGPreviewFormData, previewMode: PreviewMode): EEGPreviewRequest {
+    const previewId = generateUUID();
+
+    if (formData.file == null) {
+        throw new Error("Cannot create a preview request: no file available");
+    }
+
+    return {
+        previewId,
+        file: formData.file,
+        experimentName: formData.file.experimentName,
+        rhythm: formData.rhythm,
+        filterParams: formData.filterParams
+    };
 }
 
 function isPlainObject(value: unknown): value is Record<string, unknown> {
@@ -173,7 +207,7 @@ function normalizeMap<V>(
     throw new Error(`Expected ${field} to be an object map or entries array`);
 }
 
-function parseSingleResponse(
+function parseSingleAnalysisResponse(
     raw: Record<string, unknown>,
     dropUnknownRhythms: boolean
 ): EEGAnalysisResponse {
@@ -228,7 +262,7 @@ function parseSingleResponse(
     } as const;
 }
 
-function parseGroupResponse(raw: Record<string, unknown>): EEGAnalysisResponse {
+function parseGroupAnalysisResponse(raw: Record<string, unknown>): EEGAnalysisResponse {
     const analysisId = requireString(raw.analysisId, "analysisId");
 
     const experimentNamesRaw = requireArray(raw.experimentNames, "experimentNames");
@@ -266,19 +300,52 @@ function parseAnalysisResponse(rawJson: unknown, dropUnknownRhythms: boolean): E
     const mode = requireString(rawJson.analysisMode, "analysisMode");
 
     if (mode === 'SINGLE') {
-        return parseSingleResponse(rawJson, dropUnknownRhythms);
+        return parseSingleAnalysisResponse(rawJson, dropUnknownRhythms);
     }
 
     if (mode === 'GROUP') {
-        return parseGroupResponse(rawJson);
+        return parseGroupAnalysisResponse(rawJson);
     }
 
     throw new Error(`Unknown analysisMode: ${mode}`);
 }
 
-export function createApiClient(options: ApiClientOptions) {
+function parsePreviewResponse(rawJson: unknown): EEGPreviewResponse {
+    if (!isPlainObject(rawJson)) {
+        throw new Error("Response JSON must be an object");
+    }
+
+    const previewId = requireString(rawJson.previewId, 'previewId');
+    const experimentName = requireString(rawJson.experimentName, 'experimentName');
+    const rhythm = requireString(rawJson.rhythm, 'rhythm');
+    if (!isRhythmType(rhythm)) {
+        throw new Error(`Unknown rhythm: ${rhythm}`);
+    }
+    const plot = parsePlotPair(rawJson.plot, 'plot');
+
+    return {
+        previewId,
+        experimentName,
+        rhythm,
+        plot
+    } as const;
+}
+
+function appendFilterParamsToFormData(
+    formData: FormData,
+    filterParams: EEGFilterParams
+) {
+    formData.append("filterMin", filterParams.filterMin.toString());
+    formData.append("filterMax", filterParams.filterMax.toString());
+    formData.append("filterOrder", filterParams.filterOrder.toString());
+    formData.append("nPerSeq", filterParams.nPerSeg.toString());
+    formData.append("nOverlap", filterParams.nOverlap.toString());
+}
+
+export function createApiClient(options: ApiClientOptions): ApiClient {
     const fetchFn = options.fetchFn ?? fetch;
-    const endpoint = options.analysisEndpoint ?? "/analysis";
+    const analysisEndpoint = options.analysisEndpoint ?? "/analysis";
+    const previewEndpoint = options.previewEndpoint ?? "/preview";
     const baseUrl = options.baseUrl.replace(/\/+$/, "");
     const dropUnknownRhythms = options.dropUnknownRhythms ?? true;
 
@@ -286,13 +353,15 @@ export function createApiClient(options: ApiClientOptions) {
         request: EEGAnalysisRequest,
         signal?: AbortSignal
     ): Promise<EEGAnalysisResponse> {
-        const url = `${baseUrl}${endpoint}`;
+        const url = `${baseUrl}${analysisEndpoint}`;
 
         // Build FormData for multipart/form-data request
         const formData = new FormData();
         formData.append("analysisId", request.analysisId);
         formData.append("analysisMode", request.analysisMode);
         formData.append("brainZone", request.brainZone as string);
+
+        if (request.filterParams) appendFilterParamsToFormData(formData, request.filterParams);
 
         if (request.analysisMode === 'SINGLE') {
             // Single file, multiple rhythms
@@ -331,8 +400,48 @@ export function createApiClient(options: ApiClientOptions) {
         return parseAnalysisResponse(json, dropUnknownRhythms);
     }
 
+    async function preview(
+        request: EEGPreviewRequest,
+        signal?: AbortSignal
+    ): Promise<EEGPreviewResponse> {
+        const url = `${baseUrl}${previewEndpoint}`;
+
+        const formData = new FormData();
+        formData.append("previewId", request.previewId);
+
+        // File metadata and binary
+        formData.append("file", request.file.rawFile as Blob);
+        formData.append("timeColumn", request.file.timeColumn);
+        formData.append("amplitudeColumn", request.file.amplitudeColumn);
+        formData.append("experimentName", request.experimentName);
+        formData.append("rhythm", request.rhythm);
+
+        // Butterworth filter parameters
+        appendFilterParamsToFormData(formData, request.filterParams);
+
+        const res = await fetchFn(url, {
+            method: "POST",
+            headers: {
+                "Accept": "application/json",
+            },
+            body: formData,
+            signal: signal ?? options.signal,
+        });
+
+        if (!res.ok) {
+            const text = await res.text().catch(() => "");
+            throw new ApiError(res.status, res.statusText, text);
+        }
+
+        const json = (await res.json()) as unknown;
+
+        // Assuming you have a parser or cast the response directly
+        return parsePreviewResponse(json);
+    }
+
     return {
         analyze,
+        preview
     } as const;
 }
 

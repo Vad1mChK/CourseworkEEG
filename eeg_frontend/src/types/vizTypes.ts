@@ -52,5 +52,15 @@ interface EEGPlotPair {
     signalPlot: EEGLinePlot;
 }
 
+const EEGPlotUtils = {
+    calculateXMinMax(linePlot: EEGLinePlot): { min: number | null, max: number | null } {
+        const length = linePlot.data.length;
+        const min = linePlot.xMin ?? ((length > 0) ? linePlot.data[0].x : null);
+        const max = linePlot.xMax ?? ((length > 0) ? linePlot.data[length - 1].x : null);
+        return { min, max };
+    }
+};
+
 // Exporting the new structure
 export type { EEGSeriesMetadata, EEGCombinedDataPoint, EEGLinePlot, EEGPlotPair }
+export { EEGPlotUtils };

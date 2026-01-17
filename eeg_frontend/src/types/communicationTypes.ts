@@ -1,11 +1,12 @@
 import type {BrainZone, RhythmType} from "./eegTypes.ts";
-import type {AnalysisMode, EEGFileConfig} from "./configTypes.ts";
-import type {EEGPlotPair} from "./vizTypes.ts";
+import type {AnalysisMode, EEGFileConfig, EEGFilterParams, PreviewMode} from "./configTypes.ts";
+import type {EEGLinePlot, EEGPlotPair} from "./vizTypes.ts";
 import {sumBy} from "../util/mathUtils.ts";
 
 interface EEGBaseAnalysisRequest {
     analysisId: string; // e.g. generated UUID
     brainZone?: BrainZone;
+    filterParams?: EEGFilterParams;
 }
 interface EEGSingleAnalysisRequest extends EEGBaseAnalysisRequest {
     analysisMode: typeof AnalysisMode.SINGLE; // or AnalysisMode values
@@ -21,6 +22,7 @@ type EEGAnalysisRequest = EEGSingleAnalysisRequest | EEGGroupAnalysisRequest;
 
 interface EEGBaseAnalysisResponse {
     analysisId: string;
+    filterParams?: EEGFilterParams;
 }
 interface EEGGroupAnalysisResponse extends EEGBaseAnalysisResponse {
     analysisMode: typeof AnalysisMode.GROUP;
@@ -39,6 +41,23 @@ interface EEGSingleAnalysisResponse extends EEGBaseAnalysisResponse {
     dataByRhythm: Partial<Record<RhythmType, EEGPlotPair>>;
 }
 type EEGAnalysisResponse = EEGGroupAnalysisResponse | EEGSingleAnalysisResponse;
+
+interface EEGPreviewRequest {
+    previewId: string;
+    file: EEGFileConfig;
+    // These parameters are needed only for display
+    experimentName: string;
+    rhythm: RhythmType;
+    // Butterworth filter parameters:
+    filterParams: EEGFilterParams;
+}
+
+interface EEGPreviewResponse {
+    previewId: string;
+    experimentName: string;
+    rhythm: RhythmType;
+    plot: EEGPlotPair; // Contains both raw and filtered signals
+}
 
 export const EEGAnalysisResponseUtils = {
     getPlotPairCount: (response: Partial<EEGAnalysisResponse>): number => {
@@ -84,5 +103,7 @@ export const EEGAnalysisResponseUtils = {
 
 export type {
     EEGAnalysisRequest,
-    EEGAnalysisResponse
+    EEGAnalysisResponse,
+    EEGPreviewRequest,
+    EEGPreviewResponse
 };

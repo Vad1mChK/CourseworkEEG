@@ -24,15 +24,15 @@ const BrainZone = {
 } as const;
 const ALL_BRAIN_ZONES = Object.values(BrainZone) as BrainZone[];
 
-const DEFAULT_RHYTHM_BANDS = {
+const DEFAULT_RHYTHM_BANDS: Record<RhythmType, RhythmBand> = {
     [RhythmType.DELTA]: [0.5, 4],
     [RhythmType.THETA]: [4, 8],
     [RhythmType.ALPHA]: [8, 13],
-    [RhythmType.BETA]: [13, 30],
+    [RhythmType.BETA]: [14, 40],
     [RhythmType.GAMMA]: [30, 100],
     [RhythmType.MU]: [8, 13],
-    [RhythmType.LAMBDA]: [4, 8],
-    [RhythmType.KAPPA]: [8, 13],
+    [RhythmType.LAMBDA]: [4, 6],
+    [RhythmType.KAPPA]: [8, 12],
 } as const;
 
 // 🚨 FIX 1: Update the type to include 'readonly' tuple!

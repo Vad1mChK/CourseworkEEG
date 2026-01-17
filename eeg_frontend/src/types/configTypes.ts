@@ -7,6 +7,12 @@ const AnalysisMode = {
 } as const;
 type AnalysisMode = (typeof AnalysisMode)[keyof typeof AnalysisMode];
 
+const PreviewMode = {
+    SIGNAL: 'SIGNAL',
+    PSD: 'PSD'
+} as const;
+type PreviewMode = (typeof PreviewMode)[keyof typeof PreviewMode];
+
 interface EEGFileConfig {
     id: string;
     filename: string;
@@ -17,19 +23,36 @@ interface EEGFileConfig {
     serverId: string | null;
 }
 
-interface EEGSingleAnalysisFormData {
+interface EEGFilterParams {
+    filterMin: number;
+    filterMax: number;
+    filterOrder: number;
+    nPerSeg: number;
+    nOverlap: number;
+}
+
+interface EEGBaseAnalysisFormData {
+    analysisMode: AnalysisMode;
+    brainZone: BrainZone;
+    filterParams?: EEGFilterParams;
+}
+interface EEGSingleAnalysisFormData extends EEGBaseAnalysisFormData{
     analysisMode: typeof AnalysisMode.SINGLE;
     file: EEGFileConfig;
-    brainZone: BrainZone;
     rhythms: RhythmType[];
 }
-interface EEGGroupAnalysisFormData {
+interface EEGGroupAnalysisFormData extends EEGBaseAnalysisFormData{
     analysisMode: typeof AnalysisMode.GROUP;
     files: EEGFileConfig[];
-    brainZone: BrainZone;
     rhythm: RhythmType;
 }
 type EEGAnalysisFormData = EEGSingleAnalysisFormData | EEGGroupAnalysisFormData;
+
+interface EEGPreviewFormData {
+    file: EEGFileConfig | null;
+    rhythm: RhythmType;
+    filterParams: EEGFilterParams;
+}
 
 export const EEGAnalysisFormDataUtils = {
     getFileCount: (formData: EEGAnalysisFormData): number =>
@@ -45,4 +68,4 @@ export const EEGAnalysisFormDataUtils = {
         formData.analysisMode === 'GROUP'
 };
 
-export type { EEGFileConfig, EEGAnalysisFormData, AnalysisMode };
+export type { EEGFileConfig, EEGAnalysisFormData, EEGPreviewFormData, EEGFilterParams, AnalysisMode, PreviewMode };

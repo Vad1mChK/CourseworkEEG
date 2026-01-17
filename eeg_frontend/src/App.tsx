@@ -10,13 +10,14 @@ import ConfigurationPage from "./components/config/ConfigurationPage.tsx";
 import ResultsPage from "./components/result/ResultsPage.tsx";
 import type {AppState} from "./types/appState.ts";
 import ErrorPage from "./components/errorstate/ErrorPage.tsx";
-import {createApiClient, eegFormDataToRequest} from "./communication/apiClient.ts";
+import {createApiClient, eegFormDataToAnalysisRequest} from "./communication/apiClient.ts";
 import {
     type EEGAnalysisFormData,
     EEGAnalysisFormDataUtils,
 } from "./types/configTypes.ts";
 import LoadingPage from "./components/loading/LoadingPage.tsx";
 import {printProfilingData, saveProfilingData} from "./util/profiling.ts";
+import PreviewPlot from "./components/preview/PreviewPlot.tsx";
 
 export default function App(){
     const { t, i18n } = useTranslation();
@@ -29,6 +30,7 @@ export default function App(){
     const apiClient = useMemo(() => createApiClient({
         baseUrl: import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:3000',
         analysisEndpoint: import.meta.env.VITE_API_ANALYSIS_ENDPOINT ?? '/analyze',
+        previewEndpoint: '/preview'
     }), []);
 
     useEffect(() => {
@@ -47,7 +49,7 @@ export default function App(){
     }, []);
 
     const runAnalysis = useCallback(async (formData: EEGAnalysisFormData) => {
-        const request = eegFormDataToRequest(formData);
+        const request = eegFormDataToAnalysisRequest(formData);
         const t0 = performance.now();
 
         if (abortControllerRef.current) {
