@@ -32,7 +32,7 @@ import type {
 } from "../types/communicationTypes.ts";
 import type { RhythmType } from "../types/eegTypes.ts";
 import { isRhythmType } from "../types/eegTypes.ts";
-import type {EEGLinePlot, EEGPlotPair} from "../types/vizTypes.ts";
+import type {EEGPlotPair} from "../types/vizTypes.ts";
 import type {EEGAnalysisFormData, EEGFilterParams, EEGPreviewFormData, PreviewMode} from "../types/configTypes.ts";
 import {generateUUID} from "../util/uuidUtils.ts";
 
@@ -99,7 +99,8 @@ export function eegFormDataToAnalysisRequest(formData: EEGAnalysisFormData): EEG
 }
 
 export function eegFormDataToPreviewRequest(
-    formData: EEGPreviewFormData, previewMode: PreviewMode): EEGPreviewRequest {
+    formData: EEGPreviewFormData
+): EEGPreviewRequest {
     const previewId = generateUUID();
 
     if (formData.file == null) {
@@ -109,7 +110,7 @@ export function eegFormDataToPreviewRequest(
     return {
         previewId,
         file: formData.file,
-        experimentName: formData.file.experimentName,
+        experimentName: formData.file?.experimentName ?? "",
         rhythm: formData.rhythm,
         filterParams: formData.filterParams
     };

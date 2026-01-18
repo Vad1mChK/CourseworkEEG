@@ -10,8 +10,8 @@ import {
     MenuItem,
     Select,
     Stack,
-    FormHelperText,
-    TextField, Typography, Grid
+    TextField,
+    Typography
 } from "@mui/material"; // Added FormHelperText
 
 import ModeConfigurationBlock from "./ModeConfigurationBlock.tsx";
@@ -122,7 +122,14 @@ const ConfigurationPage = ({
                 analysisMode: 'SINGLE',
                 file: files[0],
                 brainZone: brainZone,
-                rhythms: selectedRhythms
+                rhythms: selectedRhythms,
+                filterParams: {
+                    filterMin,
+                    filterMax,
+                    filterOrder,
+                    nPerSeg: filterNperseg,
+                    nOverlap: filterNOverlap
+                }
             };
             onRunAnalysis(formData);
         }
