@@ -49,7 +49,7 @@ const ConfigurationPage = ({
     );
     const [filterMin, setFilterMin] = useState<number>(14);
     const [filterMax, setFilterMax] = useState<number>(40);
-    const [filterOrder, setFilterOrder] = useState<number>(4);
+    const [filterOrder, setFilterOrder] = useState<number>(1);
     const [filterNperseg, setFilterNperseg] = useState<number>(1024);
     const [filterNOverlap, setFilterNOverlap] = useState<number>(512);
 

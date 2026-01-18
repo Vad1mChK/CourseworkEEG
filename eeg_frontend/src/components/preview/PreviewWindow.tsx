@@ -119,37 +119,51 @@ const PreviewWindow = ({
         <Paper
             variant="outlined"
             sx={{
-                mt: 2, minHeight: 320,
+                minHeight: 320,
                 bgcolor: 'background.default', borderRadius: 2,
                 borderStyle: !previewFormData.file ? 'dashed' : 'solid',
-                // display: 'flex',
-                // flexDirection: 'column',
+                display: 'flex',
+                flexDirection: 'column',
                 // alignItems: 'stretch'
             }}
         >
-            <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: 256, flexGrow: 1, width: "100%" }}>
-                {previewState.status === 'IDLE' && (
-                    <Typography variant="body2" color="text.secondary">
-                        {t('config_file_noFilesSelected')}
-                    </Typography>
-                )}
+            <Box sx={{
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                height: 320,
+                flexDirection: 'column',
+                flexGrow: 1,
+                width: "100%",
+                p: 2
+            }}>
+                {previewState.status !== 'SUCCESS' ? (
+                    <Box sx={{ display: 'flex', flexGrow: 1, justifyContent: 'center', alignItems: 'center' }}>
+                        {previewState.status === 'IDLE' && (
+                            <Typography variant="body2" color="text.secondary">
+                                {t('config_file_noFilesSelected')}
+                            </Typography>
+                        )}
 
-                {previewState.status === 'LOADING' && (
-                    <Stack alignItems="center" spacing={1}>
-                        <CircularProgress size={32} thickness={5} />
-                        <Typography variant="caption">{t('preview_loading')}</Typography>
-                    </Stack>
-                )}
+                        {previewState.status === 'LOADING' && (
+                            <Stack alignItems="center" spacing={1}>
+                                <CircularProgress size={32} thickness={5} />
+                                <Typography variant="caption">{t('preview_loading')}</Typography>
+                            </Stack>
+                        )}
 
-                {previewState.status === 'ERROR' && (
-                    <Stack alignItems="center" spacing={1} sx={{ color: 'error.main', p: 2 }}>
-                        <AlertCircle size={32} />
-                        <Typography variant="body2" textAlign="center">{previewState.message}</Typography>
-                    </Stack>
-                )}
-
-                {previewState.status === 'SUCCESS' && (
-                    <PreviewPlot previewData={previewState.response} />
+                        {previewState.status === 'ERROR' && (
+                            <Stack alignItems="center" spacing={1} sx={{ color: 'error.main', p: 2 }}>
+                                <AlertCircle size={32} />
+                                <Typography variant="body2" textAlign="center">{previewState.message}</Typography>
+                            </Stack>
+                        )}
+                    </Box>
+                ) : (
+                    /* 2. SUCCESS state: This Box will now stretch to 100% width */
+                    <Box sx={{ width: '100%' }}>
+                        <PreviewPlot previewData={previewState.response} />
+                    </Box>
                 )}
             </Box>
             {/*<Button*/}

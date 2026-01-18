@@ -17,7 +17,7 @@ interface PreviewPlotProps {
 const PreviewPlot = ({
                          previewData,
                          headerText,
-                         height = 350
+                         height = 256
                      }: PreviewPlotProps) => {
     const { t } = useTranslation();
     const { experimentName, rhythm, plot } = previewData;
@@ -33,73 +33,85 @@ const PreviewPlot = ({
     }, [previewMode]);
 
     return (
-        <Stack spacing={2}>
+        <Stack spacing={2} sx={{ width: '100%' }}>
             {/* Metadata Row: Experiment and Rhythm Info */}
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <Stack direction="row" justifyContent="space-between" alignItems="center" width="100%" sx={{ mb: 2 }}>
-                    <ToggleButtonGroup
-                        value={previewMode}
-                        exclusive
-                        onChange={(_, next) => setPreviewMode(next)}
-                        size="small"
-                        color="primary"
-                    >
-                        <ToggleButton value="SIGNAL" sx={{ gap: 1 }}>
-                            <Activity size={16} /> {t('preview_mode_signal')}
-                        </ToggleButton>
-                        <ToggleButton value="PSD" sx={{ gap: 1 }}>
-                            <Zap size={16} /> {t('preview_mode_psd')}
-                        </ToggleButton>
-                    </ToggleButtonGroup>
-                </Stack>
-                <Box>
-                    <Typography variant="subtitle2" color="text.secondary">
+            <Box
+                sx={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    width: '100%',
+                    gap: 2, // Adds a consistent gutter between the three groups
+                    mb: 2
+                }}
+            >
+                {/* 1. Toggle Group - Sized to its buttons */}
+                <ToggleButtonGroup
+                    value={previewMode}
+                    exclusive
+                    onChange={(_, next) => next && setPreviewMode(next)}
+                    size="small"
+                    color="primary"
+                    sx={{ flexShrink: 0 }} // Prevents buttons from squishing
+                >
+                    <ToggleButton value="SIGNAL" sx={{ gap: 1, whiteSpace: 'nowrap' }}>
+                        <Activity size={16} /> {t('preview_mode_signal')}
+                    </ToggleButton>
+                    <ToggleButton value="PSD" sx={{ gap: 1, whiteSpace: 'nowrap' }}>
+                        <Zap size={16} /> {t('preview_mode_psd')}
+                    </ToggleButton>
+                </ToggleButtonGroup>
+
+                {/* 2. Experiment Info - Centered and non-wrapping */}
+                <Box sx={{ textAlign: 'center', whiteSpace: 'nowrap', minWidth: 'fit-content' }}>
+                    <Typography variant="subtitle2" color="text.secondary" sx={{ lineHeight: 1.2 }}>
                         {t('preview_experiment')}: {experimentName}
                     </Typography>
-                    <Typography variant="caption" color="text.secondary">
-                        {previewMode === 'SIGNAL' ? t('preview_mode_signal') : t('preview_mode_psd')}
-                    </Typography>
                 </Box>
+
+                {/* 3. Rhythm Chip - Pushed to the far right */}
                 <Chip
                     label={t(`misc_rhythm_${rhythm}`)}
                     size="small"
                     color="primary"
                     variant="outlined"
+                    sx={{ flexShrink: 0 }}
                 />
             </Box>
 
             {/* The Core Visualizer */}
-            { (previewMode == 'PSD') ?
-                <LinePlotVisualizer
-                    { ...plot.psdPlot }
-                    seriesMetadata={[
-                        {
-                            dataKey: 'psd',
-                            legend: t('results_linePlotPair_legend_psd'),
-                            preferredColor: 'secondary'
-                        }
-                    ]}
-                    yLogarithmic
-                    height={height}
-                    width="100%"
-                    showLegend={true}
-                /> :
-                <LinePlotVisualizer
-                    { ...plot.signalPlot }
-                    seriesMetadata={[
-                        {dataKey: 'raw', legend: t('results_linePlotPair_legend_raw')},
-                        {
-                            dataKey: 'filtered',
-                            legend: t('results_linePlotPair_legend_filtered'),
-                            preferredColor: 'primary'
-                        }
-                    ]}
-                    height={height}
-                    width="100%"
-                    showLegend={true}
-                />
-            }
-            </Stack>
+            <Box sx={{ flexGrow: 1, width: '100%', minHeight: 0, height: '100%' }}>
+                {previewMode === 'PSD' ? (
+                    <LinePlotVisualizer
+                        { ...plot.psdPlot }
+                        seriesMetadata={[
+                            {
+                                dataKey: 'psd',
+                                legend: t('results_linePlotPair_legend_psd'),
+                                preferredColor: 'secondary'
+                            }
+                        ]}
+                        yLogarithmic
+                        width="100%"
+                        showLegend={true}
+                    />
+                ) : (
+                    <LinePlotVisualizer
+                        { ...plot.signalPlot }
+                        seriesMetadata={[
+                            {dataKey: 'raw', legend: t('results_linePlotPair_legend_raw')},
+                            {
+                                dataKey: 'filtered',
+                                legend: t('results_linePlotPair_legend_filtered'),
+                                preferredColor: 'primary'
+                            }
+                        ]}
+                        width="100%"
+                        showLegend={true}
+                    />
+                )}
+            </Box>
+        </Stack>
     );
 };
 
